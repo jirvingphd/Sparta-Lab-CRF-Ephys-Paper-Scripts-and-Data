@@ -1,0 +1,87 @@
+doc = GetActiveDocument()
+DeselectAll(doc)
+%%%SELECTION OF NEURONS%%%
+
+numNeurons = GetVarCount(doc,"neuron")
+for j = 1 to numNeurons
+    fullName = GetVarName(doc,j,"neuron")
+    numName= Right(fullName, 3) %select the last 3 letters of the string (3 from the right side of the string)
+    if Find(numName,"i")>0
+        %  None of these are needed:
+        %testFind=Find(numName,"i")
+        %Trace(testFind)
+        %SelectVar(doc,i,"neuron")
+        %Trace(numName)
+    else
+        Select(doc,GetVarByName(doc,fullName))
+
+    end
+end
+
+%% Run the bursting analysis
+%SelectAllNeurons(doc)
+ModifyTemplate(doc,"_CRFburstsParamA","Add Burst Interval Vars.","True")
+Sleep(500)
+ModifyTemplate(doc,"_CRFburstsParamA","Send to Matlab","True")
+Sleep(500)
+ApplyTemplate(doc,"_CRFburstsParamA")
+Sleep(500)
+% ModifyTemplate(doc,"_CRFburstsParamA","Send to Matlab","False")
+% Sleep(500)
+
+
+DeselectAll(doc)
+%%%SELECTION OF NEURONS%%%
+numNeurons = GetVarCount(doc,"neuron")
+for j = 1 to numNeurons
+    fullName = GetVarName(doc,j,"neuron")
+    numName= Right(fullName, 1) %select the last 3 letters of the string (3 from the right side of the string)
+    Trace(numName)
+    if Find(numName,"i")>0
+        Trace("found i")
+        %  None of these are needed:
+        %testFind=Find(numName,"i")
+        %Trace(testFind)
+        %SelectVar(doc,i,"neuron")
+        %Trace(numName)
+    else
+        Select(doc,GetVarByName(doc,fullName))
+
+%    end
+%end
+
+%
+%numVars= GetVarCount(doc,"neuron")
+%for j = 1 to numVars
+%    fullName = GetVarName(doc,j,"neuron")
+%    Trace(fullName)
+%    if Find(fullName,"Unit")>0
+%    doc[fullName+"BurstSpikes"] = IntervalFilter(doc[fullName], doc[fullName+"_bursts"])
+%    doc[fullName+"IntNonBurst"] = IntOpposite(doc, doc[fullName+"_bursts"])
+
+        doc[fullName+"_BurstSpikes"] = IntervalFilter(doc[fullName], doc[fullName+" bursts"])    
+        doc[fullName+"_IntNonBurst"] = IntOpposite(doc, doc[fullName+" bursts"])
+        doc[fullName+"_NonBurstSpikes"] = IntervalFilter(doc[fullName], doc[fullName+"_IntNonBurst"])
+        
+%        Select(doc,GetInter(doc,doc[fullName+"BurstSpikes"]))
+%    else
+        j=j+1
+    end
+end
+%%%
+%SelectAllEvents(doc))
+%names = IntervalNames()
+%SelectAll(doc)
+%num_vars = GetVarCount(doc,"interval")
+%numWfs = doc.WaveNames()
+%ints = IntervalNames())
+%for i =1 to length(IntervalVars(doc))
+%    GetVarByName(doc,ints(i))
+%DeselectAll(doc)
+SelectAllEvents(doc)
+SendSelectedVarsToMatlab(doc)
+
+
+
+
+

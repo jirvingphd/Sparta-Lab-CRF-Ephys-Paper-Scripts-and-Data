@@ -1,0 +1,101 @@
+%_MakeDIDEventNames
+%James Irving - 02/25/17 - MAP/Omniplex Agnostic creation of Event Names  and filtered intervals
+%updated 03/17/17 to include a 5 ms adjustment in MAP data files to compensate for the MAP time resolution beinga t 10 ms
+%%Required document and filepath selection 
+doc=GetActiveDocument()
+%path=GetDocPath(doc)
+
+%DeselectAll(doc)
+% %%%Distinguish Event016 vs Event016_1
+% numEvents=GetVarCount(doc,"event")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Left Off Here 12/31/15 @1:16PM 
+
+% numTS_A=GetSpikeCount(GetVarByName(doc, "Event016"))    % can i use get var by name here? How else can i select Event A
+% numTS_B=GetSpikeCount(GetVarByName(doc, "Event016_1"))    % can i use get var by name here? How else can i select Event B
+
+% %numTS_A=GetVarSpikeCount(doc, EventA,"event")    % can i use get var by name here? How else can i select Event A
+% %numTS_B=GetVarSpikeCount(doc, EventB,"event")    % can i use get var by name here? How else can i select Event B
+
+
+% %%%%Rename events for templates
+% if numTS_A > numTS_B
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%RENAME EVENTS & MAKE INTERVAL FILTERS%%%%
+numEVT = GetVarCount(doc,"event")
+for j = 1 to numEVT
+    currEvt = GetVarName(doc,j,"event")
+    %numName= Right(fullName, 3)
+    if Find(currEvt,"EVT25")>0
+        doc.EventPulseUNFILT = doc.EVT25
+        doc["EventPulse"] = ISIFilter(doc["EventPulseUNFILT"], 0.01)
+        
+        %%Make interval filters around EventPulse        
+        %doc.IntFilter_IntPulse5ms = MakeIntervals(doc.EventPulse, 0, 0.005)
+        %doc.IntFilter_IntPulse10ms = MakeIntervals(doc.EventPulse, 0, 0.01)
+        %doc["IntFilter_NOT_IntPulse10ms"] = IntOpposite(doc, doc["IntFilter_IntPulse10ms"])
+        %Select(doc,GetVarByName(doc,"IntFilter_IntPulse10ms"))
+        %Select(doc,GetVarByName(doc,"IntFilter_NOT_IntPulse10ms"))
+        %SendSelectedVarsToMatlab(doc)
+        %DeselectAll(doc)
+    end
+    
+    if Find(currEvt,"EVT09")>0
+    doc.EventTrain = doc.EVT09
+    end
+
+
+    if Find(currEvt,"EVT04")>0
+    doc.EventMEDttl= doc.EVT04
+    end
+    
+    if Find(currEvt,"EVT03")>0
+    doc.EventLickRAW = doc.EVT03
+    doc["EventLick"] = Shift(doc["EventLickRAW"], -0.003)
+    end
+
+
+    %%%Check for MAP Events
+    if Find(currEvt,"Event016")>0
+        numTS_A=GetSpikeCount(GetVarByName(doc, "Event016"))    % can i use get var by name here? How else can i select Event A
+        numTS_B=GetSpikeCount(GetVarByName(doc, "Event016_1"))    % can i use get var by name here? How else can i select Event B
+
+        %numTS_A=GetVarSpikeCount(doc, EventA,"event")    % can i use get var by name here? How else can i select Event A
+        %numTS_B=GetVarSpikeCount(doc, EventB,"event")    % can i use get var by name here? How else can i select Event B
+        %%%%Rename events for templates
+        if numTS_A > numTS_B
+            doc.EventPulseRAW = doc.Event016
+            doc.EventTrain = doc.Event016_1
+        else
+             if numTS_B > numTS_A
+            doc.EventPulseRAW = doc.Event016_1
+            doc.EventTrain = doc.Event016
+             end
+        end
+
+        %%Create filtered and shifted timestamps to compensate for the 10 ms medPC resolution issue for the MAP data
+        doc.EventPulseUNFILT=doc.EventPulseRAW
+        doc["EventPulseRAWfilt10ms"]=ISIFilter(doc["EventPulseRAW"], 0.01)         %filter event FIRST
+        doc["EventPulseShift5"] = Shift(doc["EventPulseRAWfilt10ms"], -0.005)
+        doc["EventPulse"]= doc.EventPulseShift5
+        Trace("EventPulse is shifted -5ms to compensate for MEDPC resolution")
+
+        %%Create filtered and shifted timestamps to compensate for the 10 ms medPC resolution issue for the MAP data
+        doc.EventLickRAW = doc.Event015
+        doc["EventLickShift3"] = Shift(doc["EventLickRAW"], -0.003)
+        doc["EventLickShift5"] = Shift(doc["EventLickRAW"], -0.005)
+        doc["EventLickShift5_Filt10"] = ISIFilter(doc["EventLickShift5"], 0.01)
+        doc["EventLick"]=doc.EventLickShift5_Filt10
+        Trace("EventLick is shifted -5ms to compensate for MED PC resolution")
+
+    end
+    
+end
+%Select(GetVarByName(d)
+% doc.IntFilter_IntPulse5ms = MakeIntervals(doc.EventPulse, 0, 0.005)
+doc.IntFilter_IntPulse10ms = MakeIntervals(doc.EventPulse, 0, 0.01)
+doc["IntFilter_NOT_IntPulse10ms"] = IntOpposite(doc, doc["IntFilter_IntPulse10ms"])
+%end
+DeselectAll(doc)
+

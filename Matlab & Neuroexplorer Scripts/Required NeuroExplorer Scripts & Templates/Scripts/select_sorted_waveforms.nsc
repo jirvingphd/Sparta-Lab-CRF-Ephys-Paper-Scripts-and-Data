@@ -1,0 +1,23 @@
+%Select_sorted_neurons
+doc=GetActiveDocument()
+path=GetDocPath(doc)
+DeselectAll(doc)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%SELECTION OF NEURONS%%%
+numWaves = GetVarCount(doc,"wave")
+for j = 1 to numWaves
+    fullName = GetVarName(doc,j,"wave")
+    numName= Right(fullName, 5)
+    if Find(numName,"i")>0
+        %testFind=Find(numName,"i")
+        %Trace(testFind)
+        %SelectVar(doc,i,"wave")
+        %Trace(numName)
+    else
+        Select(doc,GetVarByName(doc,fullName))
+
+    end
+end
+

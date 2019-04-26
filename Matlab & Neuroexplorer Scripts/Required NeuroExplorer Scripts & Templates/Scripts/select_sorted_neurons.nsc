@@ -1,0 +1,25 @@
+%Select_sorted_neurons
+
+doc=GetActiveDocument()
+path=GetDocPath(doc)
+DeselectAll(doc)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%SELECTION OF NEURONS%%%
+numNeurons = GetVarCount(doc,"neuron")
+for j = 1 to numNeurons
+    fullName = GetVarName(doc,j,"neuron")
+    numName= Right(fullName, 3) %select the last 3 letters of the string (3 from the right side of the string)
+    if Find(numName,"i")>0
+        %  None of these are needed:
+        %testFind=Find(numName,"i")
+        %Trace(testFind)
+        %SelectVar(doc,i,"neuron")
+        %Trace(numName)
+    else
+        Select(doc,GetVarByName(doc,fullName))
+
+    end
+end
+

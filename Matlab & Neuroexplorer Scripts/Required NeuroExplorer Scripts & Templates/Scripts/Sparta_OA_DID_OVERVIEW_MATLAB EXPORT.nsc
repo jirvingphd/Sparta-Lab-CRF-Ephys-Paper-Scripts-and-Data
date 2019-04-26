@@ -1,0 +1,178 @@
+
+%%Sparta_OA_DID_OVERVIEW_MATLAB_EXPORT.nsc
+%James Irving - 02-20-2017
+%%%JUST THE PORTIONS OF Sparta_OA_DID_OVERVIEW_PHOTOTAGGING.nsc that send data to matlab and process to create DATA structure. 
+
+
+%%Required document and filepath selection 
+doc=GetActiveDocument()
+path=GetDocPath(doc)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Get File Name and Path to Save Excel and PPT files to same directory, shorten excel name if its too long
+tit = GetDocTitle(doc)
+extStart=Find(tit,".")
+filename=Left(tit,extStart-1)
+%fileFolder=Left(tit
+
+extStartPath=Find(path,".")
+filenamepath=Left(path,extStartPath-1)
+
+
+%%%To get just the folder name
+nDocname=StrLength(tit)
+nFilepath=StrLength(path)
+folder=Left(path, nFilepath-nDocname)
+%%
+
+pptName= filenamepath+" NexRes"+".ppt"
+if StrLength(pptName) > 218
+    charLeft=StrLength(pptName) - 218
+    pptShortPath=Left(filenamepath,218-charLeft)
+    pptName=pptShortPath+ " NexRes"+".ppt"
+end
+
+Trace("pptName="+pptName)
+
+
+%excelName=filenamepath+" Nex Output"+".xls"
+excelName=filenamepath+" NexRes"+".xls"
+if StrLength(excelName) > 218
+    charLeft=StrLength(excelName) - 218
+    excelShortPath=Left(filenamepath,218-charLeft)
+    excelName=excelShortPath+ " NexRes"+".ppt"
+end
+
+Trace("excelName="+excelName)
+
+
+DeselectAll(doc)
+numEvents=GetVarCount(doc,"event")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%RENAME EVENTS & MAKE INTERVAL FILTERS%%%%
+
+
+%%RENAME EVENTS
+numEVT = GetVarCount(doc,"event")
+for j = 1 to numEVT
+    currEvt = GetVarName(doc,j,"event")
+    %numName= Right(fullName, 3)
+    if Find(currEvt,"EVT25")>0
+        doc.EventPulseUNFILT = doc.EVT25
+        doc["EventPulse"] = ISIFilter(doc["EventPulseUNFILT"], 0.01)
+    end
+    
+    if Find(currEvt,"EVT09")>0
+    doc.EventTrain = doc.EVT09
+    end
+
+    if Find(currEvt,"EVT04")>0
+    doc.EventMEDttl= doc.EVT04
+    end
+    
+    if Find(currEvt,"EVT03")>0
+    doc.EventLickRAW = doc.EVT03
+    doc["EventLick"] = Shift(doc["EventLickRAW"], -0.003)
+    end
+
+
+    %%%Check for MAP Events
+    if Find(currEvt,"Event016")>0
+        numTS_A=GetSpikeCount(GetVarByName(doc, "Event016"))    % can i use get var by name here? How else can i select Event A
+        numTS_B=GetSpikeCount(GetVarByName(doc, "Event016_1"))    % can i use get var by name here? How else can i select Event B
+
+        %numTS_A=GetVarSpikeCount(doc, EventA,"event")    % can i use get var by name here? How else can i select Event A
+        %numTS_B=GetVarSpikeCount(doc, EventB,"event")    % can i use get var by name here? How else can i select Event B
+        %%%%Rename events for templates
+        if numTS_A > numTS_B
+            doc.EventPulseRAW = doc.Event016
+            doc.EventTrain = doc.Event016_1
+        else
+             if numTS_B > numTS_A
+            doc.EventPulseRAW = doc.Event016_1
+            doc.EventTrain = doc.Event016
+             end
+        end
+        %doc.EventLick=doc.Event015
+        doc.EventPulseUNFILT = doc.EventPulseRAW
+        doc["EventPulse"] = ISIFilter(doc["EventPulseUNFILT"], 0.01)
+
+        doc.EventLickRAW = doc.Event015
+        doc["EventLick"] = Shift(doc["EventLickRAW"], -0.003)
+    end
+    
+end
+
+
+%%MAKE INTERVAL FILTERS
+doc.IntFilter_IntPulse5ms = MakeIntervals(doc.EventPulse, 0, 0.005)
+doc.IntFilter_IntPulse10ms = MakeIntervals(doc.EventPulse, 0, 0.01)
+doc["IntFilter_NOT_IntPulse10ms"] = IntOpposite(doc, doc["IntFilter_IntPulse10ms"])
+
+
+%%%%%%%%%%SELECT VARIABLES AND SEND TO MATLAB
+    %%CLEAR
+    ExecuteMatlabCommand("close all; clear;")
+
+    %%%SEND EVENTS AND INTERVALS
+    Select(doc,(GetVarByName(doc,"EventLick"))))
+    Select(doc,(GetVarByName(doc,"EventLick"))))
+    Select(doc,(GetVarByName(doc,"EventPulse")))
+    Select(doc,(GetVarByName(doc,"EventTrain"))))
+    Select(doc,GetVarByName(doc,"IntFilter_IntPulse10ms"))
+    Select(doc,GetVarByName(doc,"IntFilter_NOT_IntPulse10ms"))
+    Select(doc,GetVarByName(doc,"DIDSessionInts"))
+    SendSelectedVarsToMatlab(doc)
+
+    %%Make INFO structure
+    infoDefinitions="infoFile='"+ tit +"';"
+    ExecuteMatlabCommand(infoDefinitions)
+
+    ExecuteMatlabCommand("INFO=struct(); INFO.file=infoFile; INFO.events.EventPulse=EventPulse; INFO.events.EventTrain=EventTrain; INFO.events.EventLick=EventLick; INFO.events.EventLickRaw=EventLickRAW;")
+    ExecuteMatlabCommand("INFO.intervals.DIDSession=DIDSessionInts;  INFO.intervals.IntPulse=IntFilter_IntPulse10ms; INFO.intervals.IntNotPulse=IntFilter_NOT_IntPulse10ms")
+%%%
+
+
+%%%SELECTION OF SORTED NEURONS%%%
+    numNeurons = GetVarCount(doc,"neuron")
+    for j = 1 to numNeurons
+        fullName = GetVarName(doc,j,"neuron")
+        numName= Right(fullName, 3)
+        if Find(numName,"i")>0
+
+        else
+            Select(doc,GetVarByName(doc,fullName))
+
+        end
+    end
+%%%
+
+%%%SELECTION OF SORTED WAVEFORMS%%%
+    numWFs=GetVarCount(doc,"wave")
+
+    for w = 1 to numWFs  
+        eWF= GetVarName(doc,w,"wave")
+        WFnum=Right(eWF,4)
+        if Find(WFnum,"i") > 0
+            %Trace(WFnum)
+        else
+            %SelectVar(doc,w,"wave")
+             Select(doc,GetVarByName(doc,eWF))
+        end
+    end
+%%%
+SendSelectedVarsToMatlab(doc)
+
+
+
+
+%%%SAVE DATA TO A .MAT            
+%% CHANGE TO SUBFOLDER
+cdSavepath="cd('"+folder+"')" %'
+ExecuteMatlabCommand(cdSavepath)
+
+%% SAVE MATLAB DATA
+SaveMatlabMat="save('"+ filename+"_AllDATA.mat')"     
+Trace(SaveMatlabMat)
+ExecuteMatlabCommand(SaveMatlabMat)
