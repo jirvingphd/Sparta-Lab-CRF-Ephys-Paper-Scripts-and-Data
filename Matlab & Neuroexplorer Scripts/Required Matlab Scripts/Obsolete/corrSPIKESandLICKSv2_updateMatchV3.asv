@@ -115,7 +115,13 @@ if exist('BURSTunits','var')==0
     fprintf('BURSTunits structure does not exist. Skipping burst correlations.\n')
     return
 end
-
+if isfield(BURSTunits(1).units(1),'file_num')
+    if isfield(BURSTunits(1).units(1),'lightType')==0
+        for B=1:length(BURSTunits)
+            for u=1:length(BURSTunits(B).units
+                Q = BURSTunits(B).units(u)
+                
+                
 %%Loop through BURSTunits(Q)
 for currQ=1:length(BURSTunits)
     

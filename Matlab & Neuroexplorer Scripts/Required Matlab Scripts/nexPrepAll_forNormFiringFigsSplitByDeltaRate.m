@@ -25,8 +25,8 @@ binsize=300;
 COUNTStoPlot=struct();
 %CRFcounts.all=COUNTS.light.CRF;
 
-fprintf('Running nexDATAcountUnitsFinal.\n');
-nexDATAcountUnitsFinal; %Changed nexDATAcountUnits to Final on 10-03-18
+% fprintf('Running nexDATAcountUnitsFinal.\n');
+% nexDATAcountUnitsFinal; %Changed nexDATAcountUnits to Final on 10-03-18
 
 %% Loop through COUNTS.lightLick.(lightType).(lickType) to create new COUNTStoPlot structure.
 lightList=fieldnames(COUNTS.lightLick);

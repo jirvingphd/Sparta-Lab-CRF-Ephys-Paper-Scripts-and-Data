@@ -1,4 +1,4 @@
- function [zScoredData,blMeanForZ,blStdForZ]=calcOutlierZscores(unitsByTimeMat,graph,binsize,baselinePeriod)
+ function [zScoredData,blMeanForZ,blStdForZ]=calcOutlierZscoresV2(unitsByTimeMat,graph,binsize,baselinePeriod)
 %This function accepts a data matrix that is a time series of multiple
 %units/trials, where rows = units/trials and columns=timepoints.
 %% Steup

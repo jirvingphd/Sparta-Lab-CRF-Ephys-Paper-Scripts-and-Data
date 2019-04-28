@@ -26,19 +26,19 @@ COUNTStoPlot=struct();
 %CRFcounts.all=COUNTS.light.CRF;
 
 fprintf('Running nexDATAcountUnitsFinal.\n');
-nexDATAcountUnitsFinal; %Changed nexDATAcountUnits to Final on 10-03-18
+count_unit_responses_for_table; %Changed nexDATAcountUnits to Final on 10-03-18
 
 %% Loop through COUNTS.lightLick.(lightType).(lickType) to create new COUNTStoPlot structure.
 lightList=fieldnames(COUNTS.lightLick);
 for i=1:length(lightList)
     
     currLightType=lightList{i};
-    lickList=fieldnames(COUNTS.lightLick.(currLightType));
+    lickList=fieldnames(COUNTS.lightLick.(currLightType).count);
     
     for j=1:length(lickList)
         currLickType=lickList{j};
-        COUNTStoPlot.(currLightType).(currLickType).count=COUNTS.lightLick.(currLightType).(currLickType).count;
-        [COUNTStoPlot.(currLightType).(currLickType).index]=cell2mat(COUNTS.lightLick.(currLightType).(currLickType).index);
+        COUNTStoPlot.(currLightType).count.(currLickType)=COUNTS.lightLick.(currLightType).count.(currLickType);
+        [COUNTStoPlot.(currLightType).index.(currLickType)]=cell2mat(COUNTS.lightLick.(currLightType).index.(currLickType));
     end
 end
 
@@ -56,7 +56,7 @@ for c=1:length(lightList)
     
     currLightType=lightList{c}; %select current response
     
-    lickList=fieldnames(COUNTStoPlot.(currLightType)); %Get the names of the sub-fields (the lickResponses)
+    lickList=fieldnames(COUNTStoPlot.(currLightType).count); %Get the names of the sub-fields (the lickResponses)
     
     %for each lick type
     for i=1:length(lickList)
@@ -64,8 +64,12 @@ for c=1:length(lightList)
         currLickType=lickList{i};
         
         %If there are units of currentLight-Lick type, save their Q,u index ( DATA(Q).units(u) ) as COUNTSindex
-        if COUNTStoPlot.(currLightType).(currLickType).count>0
-            COUNTSindex=COUNTStoPlot.(currLightType).(currLickType).index;
+        if COUNTStoPlot.(currLightType).count.(currLickType)>0
+            if isfield(COUNTStoPlot.(currLightType).count,currLickType)==0
+                COUNTStoPlot.(currLightType).count.(currLickType)=[NaN]
+                COUNTStoPlot.(currLightType).index.(currLickType)=[NaN]
+            end
+            COUNTSindex=COUNTStoPlot.(currLightType).index.(currLickType);
         else %if there are 0 units, skip.
             continue
         end

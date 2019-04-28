@@ -497,5 +497,5 @@ end
 % fprintf('Initial phase of spike analysis complete.\n Next phase is Burst Analysis with NeuroExplorer.\n Run makeUnitTimestampVarsForAll.m\n')
 % clearvars -except DATA* BURST* COUNTS* CRF* options* PLOT* RATES* SORT* ERR* OUTLIER* SPIKE* CORR* LICKS* corr* SPIKES
 clearCRFdata
-% fprintf('\nNext analysis phase is Burst Analysis with NeuroExplorer.\n Run makeUnitTimestampVarsForAll.m\n')
+fprintf('\nNow run calc_perc_bursts_by_hour.m\n')
 
