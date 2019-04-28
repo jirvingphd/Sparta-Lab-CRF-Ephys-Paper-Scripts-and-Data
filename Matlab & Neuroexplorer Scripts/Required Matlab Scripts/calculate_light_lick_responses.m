@@ -1,0 +1,106 @@
+%%% calculate_light_lick_responses.m
+% JMI 10/01/18
+%updated 04/27/19
+%% This script will loop through all files and units in DATA structure and use event times and spike times
+% to perform Wilcoxon signrank tests (in a sub-function) on time periods "pre, post, BL"(defined in the "criteria" structure below)
+% MUST FIRST run NexCombinedDATAstruct.m and extract DATA structure from Nex Files.
+
+% Required input:
+%   DATA structure created by NexCombinedDATAstruct.m
+%   NOTE: The waveform cross correlation statistics were previously calculated and just used again for classification here.
+
+% Requires sub-functions:
+%   -unit_responses_stat_tests
+%    -classify_unit_light_types.m
+%    -classify_unit_lick_types.m
+%   -JMI_spkMatFun
+
+% Output:
+%   Updated DATA structure with new fields populated:
+%    -DATA(Q).units(u).lightResponse.type;
+%    -DATA(Q).units(u).lightResponse.CRF;
+
+%% Run nexOptionsCriteria for parameters
+nexOptionsCriteria
+fprintf('nexOptionsCriteria loaded.\n Edit file to change criteria for classification.\n')
+
+%% START LOOPING THROUGHT EVERY DATA FILE
+for Q = 1:length(DATA)
+    
+    % Take the current EventPulse and EventLick for current DATA file.
+    currEventPulse      =   DATA(Q).fileinfo.events.EventPulse;
+    currEventLick       =   DATA(Q).fileinfo.events.EventLick;
+    
+    % Skip DATA(Q) files that have less than 20 licks.
+    if length(currEventLick)<20
+        msg=sprintf('currEventLick<20 for DATA(%d). Skipping.\n',Q);
+        warning(msg)
+        continue
+    end
+    
+    for u=1:length(DATA(Q).units)
+        
+        % Select current spike timestamps, skip unit if there are no spikes.
+        currSpikes=DATA(Q).units(u).ts;
+        if isempty(currSpikes)
+            msg=sprintf('DATA(%d).units(%d) has 0 spikes. Skipping.\n',Q,u);
+            warning(msg);
+            continue
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%% LIGHT RESPONSE CLASSIFICATION %%%%%%%%%%%%%%%%%%%%%%%%
+        
+        %SPIKES - Send the event times, spike times, and options structures to custom function: unit_responses_stat_testsFixWIP
+        %will construct perievent raster/histograms then calculate signrank results for the Pre Post and BL periods defined in options
+        optionsStats.intervals  = criteria.light;
+        [WilcStatsLight, ~ , ~] = unit_responses_stat_tests(currSpikes,currEventPulse,optionsStats,options);
+        
+        %WAVES-  Extract and save the Waveform analysis results calculated in NexCombineDATAstruct
+        if isfield(DATA(Q).units(u).lightResponse.tests,'waves')
+            WilcStatsLight.waves=DATA(Q).units(u).lightResponse.tests.waves;
+        else %Can't rememmber the exact error that would occurr that made me add the section below to address missing waves data
+            DATA(Q).units(u).lightResponse.tests.waves.xcorrR=0;
+            DATA(Q).units(u).lightResponse.CRF=false;
+        end
+        
+        %Save the data to DATA.units.lightResponse
+        DATA(Q).units(u).lightResponse.tests    =   WilcStatsLight;
+        clearvars WilcStatsLight
+        
+        %%LOGIC TESTS FOR LIGHT CLASSIFICATION "TYPE"
+        unit_light_response_stats = DATA(Q).units(u).lightResponse;
+        [lightRespose_struct, finalLightResponse] = classify_unit_light_type(unit_light_response_stats);
+        DATA(Q).units(u).lightResponse = lightRespose_struct;
+        DATA(Q).units(u).finalLightResponse = finalLightResponse;
+        
+        %% %%%%%%%%%%%%%%%%%%%%%% LICK RESPONSE CLASSIFICATION %%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % Send the event times, spike times, and options structures to custom function: unit_responses_stat_testsFixWIP
+        % will construct perievent raster/histograms then calculate signrank results for the Pre Post and BL periods defined in options
+        optionsStats.intervals=criteria.lick;
+        [WilcStatsLick ,~ ,~]=unit_responses_stat_tests(currSpikes,currEventLick,optionsStats,options);
+        
+        DATA(Q).units(u).lickResponse.tests=WilcStatsLick;
+        clearvars WilcStatsLick
+        
+        %%LOGIC TESTS FOR LICK CLASSIFICATION "TYPE"
+        unit_lick_response_stats=DATA(Q).units(u).lickResponse;
+        [lick_response_struct,finalLightResponse] = classify_unit_light_type(unit_lick_response_stats);
+        DATA(Q).units(u).lickResponse=lick_response_struct;
+        DATA(Q).units(u).finalLickResponse = finalLightResponse;
+        clearvars type* lickTypeComb CRF
+    end
+end
+clearCRFdata
+
+fprintf('Main script finished, running: renameDATAfileinfoDrinkTypeDay to ensure naming conventions consistent in DATA.fileinfo\n')
+renameDATAfileinfoDrinkTypeDay
+
+run_fill_drink_day = input('Enter drink type information?(y/n):\n','s')
+if strcmpi(run_fill_drink_day,'y')
+    fprintf('Ok. Running nexDATA_fillDrinkDay...\n');
+    nexDATA_fillDrinkDay
+end
+
+fprintf('FINISHED.\nFor full workflow, run calc_spike_binned_data_remove_outliers.m\n');
+fprintf('OR if only want counts of unit responses: count_unit_responses.m \n');

@@ -15,17 +15,19 @@ for Q=1:length(DATA)
     end
     
     %% Checking if currDrinkPreInput is empty or NaN, if so ask user for input
+    drink_type = [];
+    days_drinking = [];
     if isempty(currDrinkPreInput) || isnan(currDrinkPreInput)
         checkDrinkOutput=input('Drink type? Enter W, E, or S:\n','s');
-        if checkDrinkOutput == 'W'
-            drink_type = 'water'
+        if checkDrinkOutput == ('W'|'w')
+            drink_type = 'water';
             days_drinking = NaN;
-        elseif checkDrinkOutput == 'E'
-            drink_type = 'ethanol'
-            days_drinking = input('Enter the ethanol drinking day(if 5th day mouse has consumed ethanol, enter 5):\n')
+        elseif checkDrinkOutput == ('E'|'e')
+            drink_type = 'ethanol';
+            days_drinking = input('Enter the ethanol drinking day(if 5th day mouse has consumed ethanol, enter 5):\n');
             
-        elseif checkDrinkOutput == 'S'
-            drink_type = 'sucrose'
+        elseif checkDrinkOutput == ('S'|'s')
+            drink_type = 'sucrose';
             days_drinking = NaN;
         end
     else

@@ -241,11 +241,7 @@ for Q=1:numFiles
     %%%%%%%%%%%%%%%%%% RUN PEH FOR LICKS
     doc.ApplyTemplate('SL_PEH_LickRAW_spksec_ML')
     %        % %TEMPLATE DEFAULTS:
-    %            Bin (sec) = 0.01
-    %            XMin = -0.2
-    %			 XMax= 0.2
-    %			Normalized: spikes/sec
-    %            Select Data = All
+    %            Bin (sec) = 0.01 , XMin = -0.2 , XMax= 0.2, Normalized: spikes/sec, Select Data = All
     
     nex_PEH_LickRAW_spksec=doc.GetNumericalResults;
     nexBinTimes=nex_PEH_LickRAW_spksec(:,1);
@@ -258,7 +254,7 @@ for Q=1:numFiles
     addDATA.results.PEH_lickRAW.nex_PEH_LickRAW_spksec=nex_PEH_LickRAW_spksec;
     addDATA.results.PEH_lickRAW.nex_PEH_LickRAW_spksecColNames=nexColumnNames;
     
-    %%%%%%%%%%%%%%        %% ADDING BURST ANALYSIS BOOKMARK
+    %% %%%%%%%%%%%%        %% ADDING BURST ANALYSIS BOOKMARK
     nex_Burst_cols={};
     nex_Burst_results={};
     
@@ -268,6 +264,7 @@ for Q=1:numFiles
     nex_Burst_results = doc.GetNumericalResults;
     
     test_results = num2cell(nex_Burst_results,1);
+    
     [nex_Burst_results_cell] = remove_nan_rows(test_results);
     
 %     % make anyonymous function for finding nan
@@ -312,10 +309,13 @@ for Q=1:numFiles
             int_end = [doc.Interval(i).IntervalEnds];
             int_list{ii,2} = [int_start;int_end];
             ii=ii+1;
+        else
+            fprintf('%s is a non-burst interval and was excluded\n',int_name)
         end
     end
     BURSTS(Q).intervals = int_list;    
-    
+    fprintf('The missing unit data for BURSTS happens below\n  Units above a certain point do not have BurstSpikes and nonBurstSpikes in Nex.\n')
+    fprintf('The issue is also that the intervals for IntNonBurst are not being generated for those same # of cells')
     %% Search Nex's Event Names to Select Evt_List
     evt_list = {};
     ii=1;
@@ -415,10 +415,10 @@ for Q=1:numFiles
 end
 %runTime{3}=clock;
 release(nex);
-
+%% Run the minimal_burst_analysis script
+minimal_burst_analysis
+fprintf('minimal_burst_analysis complete.')
 %% Repalced call to nexDATA_splitSpikeRate with the code itself on 04/23/19
-%disp('running nexDATA_splitSPikeRate')
-%nexDATA_splitSpikeRate;
 for Q = 1:length(DATA)
     for u=1:length(DATA(Q).units)
         if length(DATA(Q).units)== length(DATA(Q).results.spikeRate.nexCutRateHisto)
@@ -427,9 +427,13 @@ for Q = 1:length(DATA)
     end
 end
 %% Run final script, dispaly directions to user and clearvars
-nexOptionsCriteria;
+% nexOptionsCriteria;
 % clearvars -except DATA options* criteria*
 clearCRFdata
-savefilename='extracted_nex_DATA_only.mat'
-save(savefilename,'-v7.3')
-disp('Completed. Run classify_unit_light_lick_types')
+saveQ = input('Nex analysis compelte. Save DATA file now?(y/n):\n','s');
+if contains(saveQ,'y','IgnoreCase',true)
+    savefilename='extracted_nex_DATA_only.mat'
+    save(savefilename,'-v7.3')
+end
+disp('Completed. Run calculate_light_lick_responses')
+clearCRFdata

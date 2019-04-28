@@ -1,6 +1,5 @@
 
-function [WilcStats, optionsStats, options]=nexTestUnitResponsesFixWIP_Fin(currSpikes,currEvent,optionsStats,options)
-% %nexTestUnitResponses
+function [WilcStats, optionsStats, options]=unit_responses_stat_tests(currSpikes,currEvent,optionsStats,options)
 %% This function accepts a vector of spiketimes, eventtimes, options structure for JMI_spikeMatFun, and optionsStats structure for Wilcoxon intervals. 
 %Requires  function JMI_spkMatFun
 %%Inputs:
@@ -73,6 +72,7 @@ WilcStats=struct();
 pre     =  100;%start of timeinterval(pre-event), left-inclusive
 post    =  100;%end of timeinterval(post-event), right-exlcuded(post-binsize)
 binsize = 5;
+timeBins=[-pre:binsize:post-binsize];
 
 fr      =  1; % firing rate. if 1 then stats are divided by time to get rates
 tb      =  1;
@@ -82,7 +82,6 @@ chart   =  2;
 WilcBLint	= [-100, -50];
 WilcPreInt	= [-50, 0];
 WilcPostInt	= [0, 50];
-timeBins=[-pre:binsize:post-binsize];
 
 %%Create spkMat - Matrix of PEH counts by trial 
 % [spkMat options] = JMI_spkMatFun(currSpikes,currEvent,options);

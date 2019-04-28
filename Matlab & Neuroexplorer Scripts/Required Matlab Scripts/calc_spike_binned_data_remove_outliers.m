@@ -489,7 +489,7 @@ save_data = input('Initial phase of spike analysis complete...\nSave data file n
 if strcmpi(save_data,'y')
     savefilename = 'DATA-OutliersRemoved_NoBURSTS.mat';
     save(savefilename, '-v7.3')
-    fprintf('Data was saved as:\n %s',savefilename)
+    fprintf('Data was saved as:\n %s\n',savefilename)
 % else
 %     fprintf('Data was not saved to .mat file. \n Please consider saving data now.')
 end

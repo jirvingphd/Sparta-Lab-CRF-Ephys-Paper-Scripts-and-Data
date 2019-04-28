@@ -1,5 +1,5 @@
 doc = GetActiveDocument()
-DeselectAll(doc)
+%DeselectAll(doc)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -8,23 +8,25 @@ numNeurons = GetVarCount(doc,"neuron")
 numIntervals = GetVarCount(doc,"interval")
 Trace(numIntervals)
 for j = 1 to numIntervals
+    numIntervals = GetVarCount(doc,"interval")
+
     fullName = GetVarName(doc,j,"interval")
+%    Trace(fullName)
     if Find(fullName," bursts")>0
         
         neuronName = Left(fullName, StrLength(fullName)-7) %select the last 3 letters of the string (3 from the right side of the string)
+        Trace(neuronName)
         numName = Right(neuronName,3)
+%        Trace(numName)
         if Find(numName,"i")==0
-            
-    %        Select(doc,GetVarByName(doc,fullName))
-
-            doc[neuronName+"BurstSpikes"] = IntervalFilter(doc[neuronName], doc[fullName])%+" bursts"])    
             doc[neuronName+"IntNonBurst"] = IntOpposite(doc, doc[fullName])%+" bursts"])
+            doc[neuronName+"BurstSpikes"] = IntervalFilter(doc[neuronName], doc[fullName])%+" bursts"])    
             doc[neuronName+"NonBurstSpikes"] = IntervalFilter(doc[neuronName], doc[neuronName+"IntNonBurst"])
         end
         
     end
     
-    j=j+1
+%    j=j+1
     
 end
 %%%
