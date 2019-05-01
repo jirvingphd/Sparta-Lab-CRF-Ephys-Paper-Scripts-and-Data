@@ -76,7 +76,8 @@ for Q=1:numFiles
     DATA(Q).fileinfo.intervals=[];
     DATA(Q).fileinfo.events=[];
     DATA(Q).fileinfo.mouse=[];
-    DATA(Q).fileinfo.drink=[]; %Water, Ethanol, Sucrose
+    DATA(Q).fileinfo.drinkType=[]; %Water, Ethanol, Sucrose
+    DATA(Q).fileinfo.drinkDay=[];
     DATA(Q).fileinfo.include=true;
     
     
@@ -90,7 +91,7 @@ for Q=1:numFiles
         if strcmpi(currIntName,'burst')
             continue
         end
-
+        
         
         currIntStart=currInt.IntervalStarts();
         currIntEnd=currInt.IntervalEnds();
@@ -267,55 +268,55 @@ for Q=1:numFiles
     
     [nex_Burst_results_cell] = remove_nan_rows(test_results);
     
-%     % make anyonymous function for finding nan
-% %     nancheck=@(x) any(isnan(x),x);
-%     % apply nancheck to x
-%     nanidx = cellfun(nancheck, test_results,'UniformOutput',false);
-% %     nex_Burst_results_cell(cellfun(@(x) isnan(x),x)) = [];
-%     % combine into nexBurstResults
+    %     % make anyonymous function for finding nan
+    % %     nancheck=@(x) any(isnan(x),x);
+    %     % apply nancheck to x
+    %     nanidx = cellfun(nancheck, test_results,'UniformOutput',false);
+    % %     nex_Burst_results_cell(cellfun(@(x) isnan(x),x)) = [];
+    %     % combine into nexBurstResults
     nexBurstResults = [nex_Burst_cols; nex_Burst_results_cell ];
     BURSTS(Q).results = nexBurstResults;
-  
-%     %%% Process the numerical results
-%     % Extract the name of the units from the results columns
-%     [nexColNameUnits]=cellfun(@(x)regexpi(x,'(SPK\d\d[a-h])\s(\w*)','tokens'),nex_Burst_cols,'UniformOutput',false);
-%     nexCols_unit_data = {};
-%     % Extract the unit name and then data-analysis-name into nexCols_unit_data
-%     for n=1:length(nexColNameUnits)
-%         nexCols_unit_data{n,1}=nexColNameUnits{n}{1}{1}';
-%         nexCols_unit_data{n,2}=nexColNameUnits{n}{1}{2}';
-%     end
-%     
-%     nexBurstResults=cell(2,length(nex_Burst_cols));
-%     for i=1:length(nex_Burst_cols)
-%         nexBurstResults{1,i}=nex_Burst_cols{i};
-%         nexBurstResults{2,i}=num2cell(nex_Burst_results(:,i));
-%     end
-%     
+    
+    %     %%% Process the numerical results
+    %     % Extract the name of the units from the results columns
+    %     [nexColNameUnits]=cellfun(@(x)regexpi(x,'(SPK\d\d[a-h])\s(\w*)','tokens'),nex_Burst_cols,'UniformOutput',false);
+    %     nexCols_unit_data = {};
+    %     % Extract the unit name and then data-analysis-name into nexCols_unit_data
+    %     for n=1:length(nexColNameUnits)
+    %         nexCols_unit_data{n,1}=nexColNameUnits{n}{1}{1}';
+    %         nexCols_unit_data{n,2}=nexColNameUnits{n}{1}{2}';
+    %     end
+    %
+    %     nexBurstResults=cell(2,length(nex_Burst_cols));
+    %     for i=1:length(nex_Burst_cols)
+    %         nexBurstResults{1,i}=nex_Burst_cols{i};
+    %         nexBurstResults{2,i}=num2cell(nex_Burst_results(:,i));
+    %     end
+    %
     %%% Process The Burst Spikes and Interval
     % combined results and headers into BURSTcells
     
     
     %% Getting the interval variables from Nex
-    res=nex.RunNexScript('make_burst_intervals_ML.nsc');    
+    res=nex.RunNexScript('make_burst_intervals_ML.nsc');
     %% Search Nex's Interval Names to Select Int_list
     int_list = {};
     ii=1;
     for i=1:doc.IntervalCount
         int_name = doc.Interval(i).Name;
-        if contains(int_name,'burst','IgnoreCase',true)
+        if (contains(int_name,'burst','IgnoreCase',true)==1) && (contains(int_name,'lick','IgnoreCase',true)==0)
             int_list{ii,1} = int_name;
             int_start = [doc.Interval(i).IntervalStarts];
             int_end = [doc.Interval(i).IntervalEnds];
             int_list{ii,2} = [int_start;int_end];
             ii=ii+1;
         else
-            fprintf('%s is a non-burst interval and was excluded\n',int_name)
+%             fprintf('%s is a non-burst interval and was excluded\n',int_name)
         end
     end
-    BURSTS(Q).intervals = int_list;    
-    fprintf('The missing unit data for BURSTS happens below\n  Units above a certain point do not have BurstSpikes and nonBurstSpikes in Nex.\n')
-    fprintf('The issue is also that the intervals for IntNonBurst are not being generated for those same # of cells')
+    BURSTS(Q).intervals = int_list;
+%     fprintf('The missing unit data for BURSTS happens below\n  Units above a certain point do not have BurstSpikes and nonBurstSpikes in Nex.\n')
+%     fprintf('The issue is also that the intervals for IntNonBurst are not being generated for those same # of cells')
     %% Search Nex's Event Names to Select Evt_List
     evt_list = {};
     ii=1;
@@ -391,7 +392,7 @@ for Q=1:numFiles
             k=k+1;
         end
     end
-            
+    
     send_figTitle=filename;
     
     calcWFcorrelationMLTrigd;
@@ -430,10 +431,32 @@ end
 % nexOptionsCriteria;
 % clearvars -except DATA options* criteria*
 clearCRFdata
-saveQ = input('Nex analysis compelte. Save DATA file now?(y/n):\n','s');
+%% Save
+saveQ = input('Nex analysis compelte.\nSave DATA file now?(y/n):\n','s');
 if contains(saveQ,'y','IgnoreCase',true)
-    savefilename='extracted_nex_DATA_only.mat'
-    save(savefilename,'-v7.3')
+    savefilename='extracted_nex_DATA_only.mat';
+    
+    if isfile(savefilename)
+        user_choice=[];
+        msg = sprintf('%s already exists.\n Overwrite(y), rename output(r), or cancel(n)?: (y/r/n)\n',savefilename);
+        user_choice = input(msg,'s');
+        
+        if strcmpi(user_choice,'y')
+            save(savefilename, '-v7.3')
+            fprintf('Data was saved as:\n %s\n',savefilename)
+            
+        elseif strcmpi(user_choice, 'r')
+            newname = input('Enter new filename (must end with .mat):\n','s');
+            save(newname,'-v7.3')
+            fprintf('Data was saved as:\n %s\n',newname)
+        else
+            fprintf('Analysis complete. Results not saved.\n')
+        end
+    else
+        save(savefilename, '-v7.3')
+        fprintf('Data was saved as:\n %s\n',savefilename)
+    end
 end
+%     save(savefilename,'-v7.3')
 disp('Completed. Run calculate_light_lick_responses')
 clearCRFdata

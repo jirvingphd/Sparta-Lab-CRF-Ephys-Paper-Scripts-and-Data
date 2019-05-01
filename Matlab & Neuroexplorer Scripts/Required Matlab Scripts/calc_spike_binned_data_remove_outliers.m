@@ -3,14 +3,14 @@
 % OUTLIERSfull=struct();
 varsAtStart=[who];
 
-fprintf('Running count_unit_responses.\n');
-count_unit_responses_for_table
+
 %% Now use COUNTS to process data
 OUTLIERSfull=struct();
 SPIKES=struct();
 LICKS=struct();
 % CORR=struct();
-
+fprintf('running count_unit_responses_for_table to update counts.\n')
+count_unit_responses_for_table
 dataTypeNames={'lightLick'}; %only runs on the light - lick categories since will be removing OUTLIERSfull of same type
 d=1;
 % for d=1:length(dataTypeNames)
@@ -240,10 +240,10 @@ for l=1:length(lightTypes)
         currData=combinedDataMat;
         [currDataFilled]=fillmissing(currData,'linear',2);
         
-        %%SAVE OUTLIERS DATA 
-%[i]     %NOTE: The data filled in here will be used for all subsequent  analysis. 
-         %to change data used for normalized firing and prism, change what is filled in OUTLIERSfull...cleanedData
-        OUTLIERSfull.(currLightType).(currLickType).cleanedData= currDataFilled; 
+        %%SAVE OUTLIERS DATA
+        %[i]     %NOTE: The data filled in here will be used for all subsequent  analysis.
+        %to change data used for normalized firing and prism, change what is filled in OUTLIERSfull...cleanedData
+        OUTLIERSfull.(currLightType).(currLickType).cleanedData= currDataFilled;
         OUTLIERSfull.(currLightType).(currLickType).cleanedDataIdx= dataIdx;
         
     end
@@ -312,60 +312,60 @@ for l=1:length(lightTypes)
             currQ=indexToLoop(c,1);
             currU=indexToLoop(c,2);
             
-                %%% THIS PHASE OF PROCESSING WAS REMOVED PER
-                %               REQUEST OF DENNIS AND SONIA? or just not needed.  (pretty sure)
-                %             %Check if currUnit is included in nanDataRows1
-                %             if isempty(nanDataRows1)==0 || isempty(nanDataRows2)==0
-                %                 badUnitNan1=[];
-                %                 badUnitNan2=[];
-                %
-                %                 if isempty(nanDataRows1)==0
-                %                     for ii=1:length(nanDataRows1)
-                %
-                %                         [badUnitNan1]=startFullIdx(nanDataRows1(ii),:);
-                %
-                %                         if badUnitNan1(1)==currQ && badUnitNan1(2)==currU
-                %                             currUnitOuts.isTooNaN=1;
-                %                             currUnitOuts.TF1=[];
-                %                             currUnitOuts.TF2=[];
-                %                             currUnitOuts.verifyLight=currLightType;
-                %                             currUnitOuts.verifyLick=currLickType;
-                %                             currUnitOuts.verifyQuIdx=[currQ,currU];
-                %                             DATA(currQ).units(currU).include=0;
-                %
-                %                             DATA(currQ).units(currU).outliers=currUnitOuts;
-                %                             c=c+1;
-                %                             break;
-                %                         end
-                %
-                %                     end
-                %                 end
-                %
-                %                 jj=1;
-                %                 %Check if currUniti
-                %                 if isempty(nanDataRows2)==0
-                %                     badUnitNan2=[];
-                %                     for jj=1:length(nanDataRows2)
-                %                         [badUnitNan2]=preNan2QuIdx(nanDataRows2(jj),:);
-                %                         if badUnitNan2(1)==currQ && badUnitNan2(2)==currU
-                %                             currUnitOuts.isTooNaN=1;
-                %                             currUnitOuts.TF1=[];
-                %                             currUnitOuts.TF2=[];
-                %
-                %                             currUnitOuts.verifyLight=currLightType;
-                %                             currUnitOuts.verifyLick=currLickType;
-                %                             currUnitOuts.verifyQuIdx=[currQ,currU];
-                %                             DATA(currQ).units(currU).outliers=currUnitOuts;
-                %                             c=c+1;
-                %                             %                             break;
-                %                             break;
-                %                         end
-                %                     end
-                %                 end
-                %             end
-                %         end
+            %%% THIS PHASE OF PROCESSING WAS REMOVED PER
+            %               REQUEST OF DENNIS AND SONIA? or just not needed.  (pretty sure)
+            %             %Check if currUnit is included in nanDataRows1
+            %             if isempty(nanDataRows1)==0 || isempty(nanDataRows2)==0
+            %                 badUnitNan1=[];
+            %                 badUnitNan2=[];
+            %
+            %                 if isempty(nanDataRows1)==0
+            %                     for ii=1:length(nanDataRows1)
+            %
+            %                         [badUnitNan1]=startFullIdx(nanDataRows1(ii),:);
+            %
+            %                         if badUnitNan1(1)==currQ && badUnitNan1(2)==currU
+            %                             currUnitOuts.isTooNaN=1;
+            %                             currUnitOuts.TF1=[];
+            %                             currUnitOuts.TF2=[];
+            %                             currUnitOuts.verifyLight=currLightType;
+            %                             currUnitOuts.verifyLick=currLickType;
+            %                             currUnitOuts.verifyQuIdx=[currQ,currU];
+            %                             DATA(currQ).units(currU).include=0;
+            %
+            %                             DATA(currQ).units(currU).outliers=currUnitOuts;
+            %                             c=c+1;
+            %                             break;
+            %                         end
+            %
+            %                     end
+            %                 end
+            %
+            %                 jj=1;
+            %                 %Check if currUniti
+            %                 if isempty(nanDataRows2)==0
+            %                     badUnitNan2=[];
+            %                     for jj=1:length(nanDataRows2)
+            %                         [badUnitNan2]=preNan2QuIdx(nanDataRows2(jj),:);
+            %                         if badUnitNan2(1)==currQ && badUnitNan2(2)==currU
+            %                             currUnitOuts.isTooNaN=1;
+            %                             currUnitOuts.TF1=[];
+            %                             currUnitOuts.TF2=[];
+            %
+            %                             currUnitOuts.verifyLight=currLightType;
+            %                             currUnitOuts.verifyLick=currLickType;
+            %                             currUnitOuts.verifyQuIdx=[currQ,currU];
+            %                             DATA(currQ).units(currU).outliers=currUnitOuts;
+            %                             c=c+1;
+            %                             %                             break;
+            %                             break;
+            %                         end
+            %                     end
+            %                 end
+            %             end
+            %         end
             
-            currUnitOuts.isTooNaN=0; %Bad units were already filled in previously above with isTooNaN=1 
+            currUnitOuts.isTooNaN=0; %Bad units were already filled in previously above with isTooNaN=1
             currUnitOuts.TF1=TF1(c,:);
             currUnitOuts.TF2=TF2(c,:);
             currUnitOuts.verifyLight=currLightType;
@@ -388,7 +388,7 @@ for l=1:length(lightTypes)
             newSpikeRateDATA.avgRateFullSession=[];
             newSpikeRateDATA.avgRateByHour=[];
             
-%[i]        % Take group matrices of spikeRates to separate by unit
+            %[i]        % Take group matrices of spikeRates to separate by unit
             spikeRatesCleanMat=OUTLIERSfull.(currLightType).(currLickType).cleanedData;
             spikeRatesUncleanMat=OUTLIERSfull.(currLightType).(currLickType).rawData;
             spikeRatesCutBins=OUTLIERSfull.(currLightType).(currLickType).binsRaw;
@@ -404,12 +404,12 @@ for l=1:length(lightTypes)
             SPIKES(currQ).units(currU).binsRaw=spikeRatesCutBins;
             
             
-%[i]        % Exclude units that do not have data for at least 75% of timebins 
+            %[i]        % Exclude units that do not have data for at least 75% of timebins
             if (length(spikeRatesCutBins)/length(spikeRatesUncleanMat(c,:)))<0.75
                 DATA(currQ).units(currU).include=0;
             end
             
-
+            
             %% CV CALCULATION
             
             %get timestamps
@@ -420,7 +420,7 @@ for l=1:length(lightTypes)
             currTestInt=cell2mat( arrayfun(@(x)  strcmp(x.intName,searchFor), DATA(currQ).fileinfo.intervals,'UniformOutput',false));
             currGoodInt=DATA(currQ).fileinfo.intervals(currTestInt==1).intTimes;
             
-            % Filter out non DIDSession spikes 
+            % Filter out non DIDSession spikes
             currGoodSpikes=cutTimesGoodIntsFast(currTimes,currGoodInt);
             
             %Calculate average ISIs
@@ -484,18 +484,41 @@ for l=1:length(lightTypes)
     
 end
 clearCRFdata
+%% Run binned perc burst calculations
 
+if exist('BURSTunits','var')
+    fprintf("Running calc_perc_bursts_by_hour.m\n")
+    calc_perc_bursts_by_hour
+end
+
+%% Save
 save_data = input('Initial phase of spike analysis complete...\nSave data file now?(y/n):\n','s');
 if strcmpi(save_data,'y')
-    savefilename = 'DATA-OutliersRemoved_NoBURSTS.mat';
-    save(savefilename, '-v7.3')
-    fprintf('Data was saved as:\n %s\n',savefilename)
-% else
-%     fprintf('Data was not saved to .mat file. \n Please consider saving data now.')
+    savefilename = 'DATA_imported_binned_spikes_bursts.mat';
+    
+    if isfile(savefilename)
+        msg = sprintf('%s already exists.\nOverwrite(y), rename output(r), or cancel(n)?: (y/r/n)\n',savefilename);
+        user_choice = input(msg,'s');
+        
+        if strcmpi(user_choice,'y')
+            save(savefilename, '-v7.3')
+            fprintf('Data was saved as:\n %s\n',savefilename)
+            
+        elseif strcmpi(user_choice,'r')
+            newname = input('Enter new filename (must end with .mat):\n','s');
+            save(newname,'-v7.3')
+            fprintf('Data was saved as:\n %s\n',newname)
+        else
+            fprintf('Analysis complete. Results not saved.\n')
+        end
+    else
+        save(savefilename, '-v7.3')
+        fprintf('Data was saved as:\n %s\n',savefilename)
+    end
 end
 
 % fprintf('Initial phase of spike analysis complete.\n Next phase is Burst Analysis with NeuroExplorer.\n Run makeUnitTimestampVarsForAll.m\n')
 % clearvars -except DATA* BURST* COUNTS* CRF* options* PLOT* RATES* SORT* ERR* OUTLIER* SPIKE* CORR* LICKS* corr* SPIKES
 clearCRFdata
-fprintf('\nNow run calc_perc_bursts_by_hour.m\n')
+% fprintf('\nNow run calc_perc_bursts_by_hour.m\n')
 

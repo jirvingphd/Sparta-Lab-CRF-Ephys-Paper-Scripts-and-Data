@@ -36,7 +36,7 @@ printList(1).hr4_spk_sec ='Hour4-Spk/sec';
 printList(1).hr4_num_licks ='Hour4-NumLicks';
 % % printList{1,10}='Spk/sec-Full4Hr';
 
-
+ERRunitsOut=[];
 % j=2;
 for Q=1:length(DATA)
     j=Q+1

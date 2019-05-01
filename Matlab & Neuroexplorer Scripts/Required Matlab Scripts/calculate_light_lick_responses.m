@@ -31,8 +31,9 @@ for Q = 1:length(DATA)
     currEventPulse      =   DATA(Q).fileinfo.events.EventPulse;
     currEventLick       =   DATA(Q).fileinfo.events.EventLick;
     
-    % Skip DATA(Q) files that have less than 20 licks.
+%     % Skip DATA(Q) files that have less than 20 licks.
     if length(currEventLick)<20
+        DATA(Q).fileinfo.include=false;
         msg=sprintf('currEventLick<20 for DATA(%d). Skipping.\n',Q);
         warning(msg)
         continue
@@ -93,14 +94,20 @@ for Q = 1:length(DATA)
 end
 clearCRFdata
 
-fprintf('Main script finished, running: renameDATAfileinfoDrinkTypeDay to ensure naming conventions consistent in DATA.fileinfo\n')
-renameDATAfileinfoDrinkTypeDay
+% fprintf('Main script finished, running: renameDATAfileinfoDrinkTypeDay to ensure naming conventions consistent in DATA.fileinfo\n')
+% renameDATAfileinfoDrinkTypeDay
+fprintf('Running: detect_or_fill_drink_days.\n')
+detect_or_fill_drink_days
 
-run_fill_drink_day = input('Enter drink type information?(y/n):\n','s')
-if strcmpi(run_fill_drink_day,'y')
-    fprintf('Ok. Running nexDATA_fillDrinkDay...\n');
-    nexDATA_fillDrinkDay
-end
+% run_fill_drink_day = input('Enter drink type information?(y/n):\n','s')
+% if strcmpi(run_fill_drink_day,'y')
+%     fprintf('Ok. Running nexDATA_fillDrinkDay...\n');
+%     nexDATA_fillDrinkDay
+% end
+
+fprintf('Running count_unit_responses.\n');
+count_unit_responses_for_table
 
 fprintf('FINISHED.\nFor full workflow, run calc_spike_binned_data_remove_outliers.m\n');
-fprintf('OR if only want counts of unit responses: count_unit_responses.m \n');
+% fprintf('OR if only want counts of unit responses: count_unit_responses.m \n');
+clearCRFdata

@@ -19,7 +19,7 @@
 
 fillMethod1='0';
 fillMethod2='0';
-% 
+%
 % fillMethod1='nearest';
 % fillMethod2='nearest';
 
@@ -29,7 +29,7 @@ end
 optionsOutliers.fillMethod1=sprintf(fillMethod1);
 optionsOutliers.fillMethod2=sprintf(fillMethod2);
 % fill1=num2str(fillMethod1)
-fprintf('Non-spike data outliers will be replaced using 1) %s 2) %s.\n',fillMethod1,fillMethod2); 
+fprintf('Non-spike data outliers will be replaced using 1) %s 2) %s.\n',fillMethod1,fillMethod2);
 
 %% start with parts of calcPercBurstsByBins
 varsAtStart=who;
@@ -53,37 +53,49 @@ x=1; y=1;
 %% Calculate and fill in spikes in bursts statistics
 for Q=1:length(DATA)
     if DATA(Q).fileinfo.include==0
+%         fprintf('Skipping 
         continue;
     end
     for u=1:length(DATA(Q).units)
         if DATA(Q).units(u).include==0
+            fprintf('DATA(%d).units(%d).include==0',Q,u)
             continue
         end
         percSpikesInBurstByHour=struct();
         
         %Find and take DIDSessionInts
+        currDIDSessInts = [];
+        allfile_int=[];
         for j=1:length(DATA(Q).fileinfo.intervals)
             checkCurrInt=DATA(Q).fileinfo.intervals(j);
-            if strcmp(checkCurrInt.intName,'DIDSessionInts')>0
+            if strcmpi(checkCurrInt.intName,'DIDSessionInts')>0
                 currDIDSessInts=DATA(Q).fileinfo.intervals(j).intTimes;
-            elseif strcmp(checkCurrInt.intName,'AllFile')
-                currDIDSessInts=DATA(Q).fileinfo.intervals(j).intTimes;
-                fprintf('DIDSessionInts Not found in DATA(%d). Using AllFile interval instead.',Q)
-
+            end
+            if strcmpi(checkCurrInt.intName,'AllFile')>0
+                allfile_int=DATA(Q).fileinfo.intervals(j).intTimes;
             end
         end
+        if isempty(currDIDSessInts)==1 && isempty(allfile_int)==0
+            currDIDSessInts =     allfile_int;
+            fprintf('DIDSessionInts Not found in DATA(%d). Using AllFile interval instead.',Q)
+        end
+        
+        %     end
         
         %Empty vars and get the timestamps and bursting intervals from DATA
         %and BURSTS
         currBurstInts=[];       currSpikesRaw=[];        currBurstInts=[];        allSpikes=[];        binCountsAll=[];
         
-        
+        %         if DATA(Q).fileinfo.include==0
+        %             continue
+        %         end
         %% Verify and retrieve outliers and burst timestamps
         if isfield(DATA(Q).units(u),'outliers')==0
             
             warning('DATA(%d).units(%d) is missing outliers field.\n',Q,u)
             ERRoutliersMissing=[ERRoutliersMissing; Q u];
             DATA(Q).units(u).include=0;
+            fprintf('DATA(%d).units(%d).include==0',Q,u)
             continue;
             
         elseif isempty(DATA(Q).units(u).outliers)
@@ -91,6 +103,7 @@ for Q=1:length(DATA)
             warning('DATA(%d).units(%d) has empty outliers.\n',Q,u)
             ERRoutliersEmpty=[ERRoutliersEmpty; Q u];
             DATA(Q).units(u).include=0;
+            fprintf('DATA(%d).units(%d).include==0',Q,u)
             fprintf('think of an alternative way to deal with too NaN units who do not have outliers field!.\n')
             continue
             
@@ -175,6 +188,7 @@ for Q=1:length(DATA)
         currUnitResults.percSpikesInBurstsCutClean=cleanedCutData;
         
         %% Fill in the fields of tempSpikesStruct that will be used in all subsequent burst calculations:
+        tempSpikesStruct=struct();
         tempSpikesStruct.percSpikesInBursts.binnedMeans=currUnitResults.percSpikesInBurstsCut;
         tempSpikesStruct.percSpikesInBursts.binnedMeansClean= currUnitResults.percSpikesInBurstsCutClean;
         tempSpikesStruct.percSpikesInBursts.binnedMeansEdges= currUnitResults.percSpikesInBurstsCutBinEdges;%
@@ -205,6 +219,7 @@ for Q=1:length(DATA)
         end
         
         tempSpikesStruct.percSpikesInBursts.burstingByHour=burstingByHour;
+        fprintf('BURSTunits(%d).units(%d).BURSTstats created.\n',Q,u)
         BURSTunits(Q).units(u).BURSTstats=tempSpikesStruct;
         BURSTunits(Q).units(u).outliers=currOutliers;
         
@@ -222,7 +237,10 @@ statsToRun={'SpikesInBurst','MeanISIinBurst','PeakFreqInBurst','BurstDuration','
 % fprintf('Removed BurstsPerSecond from the script for now to produce excel faster.\n')
 
 for Q=1:length(BURSTunits)
-    
+    if DATA(Q).fileinfo.include==0
+        fprintf('Skipping DATA(%d) since include==0',Q)
+        continue
+    end
     %Find and take DIDSessionInts
     for j=1:length(DATA(Q).fileinfo.intervals)
         checkCurrInt=DATA(Q).fileinfo.intervals(j);
@@ -236,13 +254,19 @@ for Q=1:length(BURSTunits)
         %                 filtSpikesBursts=spikesBursts(spikesBursts>intStart & spikesBursts<intEnd);
         
         % Extract the data to calculate binned averages from
-        tempBURSTbins=BURSTunits(Q).units(u).BURSTstats;
+        if DATA(Q).units(u).include==0
+            fprintf('DATA(%d).units(%d).include==0.\n',Q,u)
+            continue
+        end
         
+        
+        tempBURSTbins=BURSTunits(Q).units(u).BURSTstats;
+
         if isfield(tempBURSTbins,'percSpikesInBursts')==0
             ERRmissPercBurst=[ERRmissPercBurst; Q u];
             fprintf('There was no percSpikesInBursts data for BURST(%d).units(%d),BURSTstats.\n',Q,u);
             DATA(Q).units(u).include=0;
-            continue 
+            continue
         else
             tempBURSTbins.percSpikesInBursts=BURSTunits(Q).units(u).BURSTstats.percSpikesInBursts;
         end
@@ -266,7 +290,7 @@ for Q=1:length(BURSTunits)
         %Do a loop for each bin's mean
         numBinsToLoop=unique(tsBinsIdx);
         %should maybe be numBinsToLoops=length(
-%         fprintf('Investigate hows tsBinsIdx is being used/looped versus numBinsToLoop to troubleshoot very long BurstDurations.\n\n')
+        %         fprintf('Investigate hows tsBinsIdx is being used/looped versus numBinsToLoop to troubleshoot very long BurstDurations.\n\n')
         
         numBinsToLoop=numBinsToLoop(numBinsToLoop>0);
         
@@ -287,12 +311,12 @@ for Q=1:length(BURSTunits)
                 
                 
                 currNexData=BURSTunits(Q).units(u).(currStat);
-%                 meanBinsData=[];
-
+                %                 meanBinsData=[];
+                
                 %Generate the binned data equivalent of cutData
-%                 for n=1:length(numBinsToLoop)
+                %                 for n=1:length(numBinsToLoop)
                 for n=1:length(timebinsAll)
-%                     currBinIdxNum=numBinsToLoop(n);
+                    %                     currBinIdxNum=numBinsToLoop(n);
                     currBinIdxNum=n;
                     meanBinsData(n)=nanmean(currNexData(tsBinsIdx==currBinIdxNum)); %essentially equivalent to binCountsAll
                 end
@@ -311,32 +335,32 @@ for Q=1:length(BURSTunits)
             %currDataToClean is defined above
             currBins=cutBins;
             
-%             try
-                currOutliers=DATA(Q).units(u).outliers;
-                if currOutliers.isTooNaN==1
-                    DATA(Q).units(u).include=0;
-                    continue
-                end
-%             catch
-%                 msg=warning('Missing DATA(%d).units(%d).outliers field.\n',Q,u);
-%             end
+            %             try
+            currOutliers=DATA(Q).units(u).outliers;
+            if currOutliers.isTooNaN==1
+                DATA(Q).units(u).include=0;
+                continue
+            end
+            %             catch
+            %                 msg=warning('Missing DATA(%d).units(%d).outliers field.\n',Q,u);
+            %             end
             
             
-%             try
-                %             [cleanedCutData]=replaceBinnedOutliers(currDataToClean,currOutliers,'nearest','nearest');
-                [cleanedCutData,include,outliersOut]=replaceBinnedOutliers(currDataToClean,currOutliers,fillMethod1,fillMethod2);
-                if include==0
-                    DATA(Q).units(u).include=0;
-                    DATA(Q).units(u).outliers=outliersOut;
-                    DATA(Q).units(u).outliers.updated=1;
-                end
-%             catch
-%                 
-%                 msg=sprintf('Error running replaceBinnedOutliers on DATA(%d).units(%d).\n',Q,u);
-%                 warning(msg)
-%                 
-%             end
-%             currUnitResults.percSpikesInBurstsCutClean=cleanedCutData;
+            %             try
+            %             [cleanedCutData]=replaceBinnedOutliers(currDataToClean,currOutliers,'nearest','nearest');
+            [cleanedCutData,include,outliersOut]=replaceBinnedOutliers(currDataToClean,currOutliers,fillMethod1,fillMethod2);
+            if include==0
+                DATA(Q).units(u).include=0;
+                DATA(Q).units(u).outliers=outliersOut;
+                DATA(Q).units(u).outliers.updated=1;
+            end
+            %             catch
+            %
+            %                 msg=sprintf('Error running replaceBinnedOutliers on DATA(%d).units(%d).\n',Q,u);
+            %                 warning(msg)
+            %
+            %             end
+            %             currUnitResults.percSpikesInBurstsCutClean=cleanedCutData;
             %             try
             %                 [cleanedCutData,include]=replaceBinnedOutliers(currDataToClean,currOutliers,fillMethod1,fillMethod2);
             %             catch

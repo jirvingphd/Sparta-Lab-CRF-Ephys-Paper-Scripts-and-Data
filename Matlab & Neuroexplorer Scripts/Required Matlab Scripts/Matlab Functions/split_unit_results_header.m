@@ -1,7 +1,6 @@
 function [unit_name,result_name] = split_unit_results_header(unit_header,expr_unit_names)
 % Accepts a string of "SPK##/Sig### ResultName" and returns the unit name and REsultName separated. 
 %   Detailed explanation goes here
-
 if nargin <2
     if ischar(unit_header)
         unit_header = convertCharsToStrings(unit_header);
@@ -15,10 +14,15 @@ end
 
 
 [token_matches]= regexpi(unit_header,expr_unit_names,'tokens'); %,'uni',false);
-token_matches = token_matches{:};
+if isempty(token_matches)
+    fprintf('%s does not contain a unit name.\n',unit_header)
+    unit_name = NaN;
+    result_name=NaN;
+else
+    token_matches = token_matches{:};
 
-% Extract the unit name and then data-analysis-name into nexCols_unit_data
-unit_name = token_matches{1};
-result_name = token_matches{2};
+    % Extract the unit name and then data-analysis-name into nexCols_unit_data
+    unit_name = token_matches{1};
+    result_name = token_matches{2};
 end
 

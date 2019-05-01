@@ -28,7 +28,12 @@ for B=1:length(BURSTS)
         
         for n = 1:length(results_array_processed)%,2)
             % create vars from current cell array
+            
             unit_name = results_array_processed{n}{2,1};
+            if isnan(unit_name)
+                continue
+            end
+                
             result_name = results_array_processed{n}{1,1};
             result_data = results_array_processed{n}{3,1};
             
@@ -57,14 +62,14 @@ end
 for B=1:length(BURSTunits)
     
     if length(BURSTunits(B))~=length(DATA(B))
-        error(sprintf('BURSTunits length = %d, but DATA length = %d',length(BURSTunits(B)),length(DATA(B))))
+        error(sprintf('BURSTunits length = %d, but DATA length = %d',length(BURSTunits(B)),length(DATA(B))));
     else
         for u=1:length(BURSTunits(B).units)
             burst_unit_name = BURSTunits(B).units(u).name;
             data_unit_name = DATA(B).units(u).name;
             
             if burst_unit_name ~= data_unit_name
-                error(sprintf('BURSTunits(%d).units(%d).name=%s, but DATA.units.name= %s',B,u,burst_unit_name,data_unit_name))
+                error(sprintf('BURSTunits(%d).units(%d).name=%s, but DATA.units.name= %s',B,u,burst_unit_name,data_unit_name));
             end
         end
     end

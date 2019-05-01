@@ -22,13 +22,15 @@ binsize=300;
 
 %% Generate COUNTStoPlot structure:
 % Extract the COUNTS/indices every lightLick type (not just light or just lick) and RATEScut structure
-COUNTStoPlot=struct();
-%CRFcounts.all=COUNTS.light.CRF;
-
-fprintf('Running nexDATAcountUnitsFinal.\n');
-count_unit_responses_for_table; %Changed nexDATAcountUnits to Final on 10-03-18
-
+% %CRFcounts.all=COUNTS.light.CRF;
+% if exist('COUNTS','var')==0
+%     fprintf('COUNTS var not found.\nRunning count_unit_responses_for_table.\n');
+%     count_unit_responses_for_table; %Changed nexDATAcountUnits to Final on 10-03-18
+% end
+count_unit_responses_for_table;
 %% Loop through COUNTS.lightLick.(lightType).(lickType) to create new COUNTStoPlot structure.
+COUNTStoPlot=struct();
+
 lightList=fieldnames(COUNTS.lightLick);
 for i=1:length(lightList)
     
@@ -66,8 +68,8 @@ for c=1:length(lightList)
         %If there are units of currentLight-Lick type, save their Q,u index ( DATA(Q).units(u) ) as COUNTSindex
         if COUNTStoPlot.(currLightType).count.(currLickType)>0
             if isfield(COUNTStoPlot.(currLightType).count,currLickType)==0
-                COUNTStoPlot.(currLightType).count.(currLickType)=[NaN]
-                COUNTStoPlot.(currLightType).index.(currLickType)=[NaN]
+                COUNTStoPlot.(currLightType).count.(currLickType)=[NaN];
+                COUNTStoPlot.(currLightType).index.(currLickType)=[NaN];
             end
             COUNTSindex=COUNTStoPlot.(currLightType).index.(currLickType);
         else %if there are 0 units, skip.
@@ -81,7 +83,7 @@ for c=1:length(lightList)
         Q=[];
         u=[];
         idxUnits=COUNTSindex;
-        while k<=(size(idxUnits,1));
+        while k<=(size(idxUnits,1))
             
             Q=idxUnits(k,1);
             u=idxUnits(k,2);
@@ -96,7 +98,7 @@ for c=1:length(lightList)
             end
             
             if isempty(goodInts)
-                error(sprintf('Could not find DIDSessionInts at Q=%d u=%d',Q,u))
+                error(sprintf('Could not find DIDSessionInts at Q=%d u=%d',Q,u));
             end
             %
             
@@ -554,7 +556,7 @@ SORTbyLightOut(2).sortedRateData=sortedRateData;
 SORTbyLightOut(2).sortedBurstData=sortedBurstData;
 
 % end
-%% SORTbyLightOut, not create and graph PLOTdata
+%% SORTbyLightOut, now create and graph PLOTdata
 close all
 PLOTdataNonCRF=struct();
 spaceRow=NaN(1,size(SORTbyLightOut(1).sortedRateData,2));
