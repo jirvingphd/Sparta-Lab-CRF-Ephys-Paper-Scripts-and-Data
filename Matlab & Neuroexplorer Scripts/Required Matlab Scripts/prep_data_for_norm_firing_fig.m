@@ -13,9 +13,9 @@
 %% User must edit these variables to customize the resutls:
 % Uncomment ONE drinkToProcess
 fprintf('This new version is made for all units, not just CRF.\n');
-drinkToProcess='ethanol';
+% drinkToProcess='ethanol';
 % drinkToProcess='water';
-% drinkToProcess='sucrose';
+drinkToProcess='sucrose';
 
 %Change binsize (sec) for firing rates if need be
 binsize=300;
