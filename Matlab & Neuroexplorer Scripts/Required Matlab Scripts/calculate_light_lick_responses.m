@@ -53,9 +53,9 @@ for Q = 1:length(DATA)
         
         %SPIKES - Send the event times, spike times, and options structures to custom function: unit_responses_stat_testsFixWIP
         %will construct perievent raster/histograms then calculate signrank results for the Pre Post and BL periods defined in options
-        optionsStats.intervals  = criteria.light;
-        [WilcStatsLight, ~ , ~] = unit_responses_stat_tests(currSpikes,currEventPulse,optionsStats,options);
-        
+%         optionsStats.intervals  = criteria.light;
+        [WilcStatsLight, ~ , ~] = unit_responses_stat_tests(currSpikes,currEventPulse,optionsStats,'light',options);
+        WilcStatsLight.criteria = optionsStats.('light');
         %WAVES-  Extract and save the Waveform analysis results calculated in NexCombineDATAstruct
         if isfield(DATA(Q).units(u).lightResponse.tests,'waves')
             WilcStatsLight.waves=DATA(Q).units(u).lightResponse.tests.waves;
@@ -70,8 +70,8 @@ for Q = 1:length(DATA)
         
         %%LOGIC TESTS FOR LIGHT CLASSIFICATION "TYPE"
         unit_light_response_stats = DATA(Q).units(u).lightResponse;
-        [lightRespose_struct, finalLightResponse] = classify_unit_light_type(unit_light_response_stats);
-        DATA(Q).units(u).lightResponse = lightRespose_struct;
+        [lightResponse_struct, finalLightResponse] = classify_unit_light_type(unit_light_response_stats);
+        DATA(Q).units(u).lightResponse = lightResponse_struct;
         DATA(Q).units(u).finalLightResponse = finalLightResponse;
         
         %% %%%%%%%%%%%%%%%%%%%%%% LICK RESPONSE CLASSIFICATION %%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,16 +79,16 @@ for Q = 1:length(DATA)
         % Send the event times, spike times, and options structures to custom function: unit_responses_stat_testsFixWIP
         % will construct perievent raster/histograms then calculate signrank results for the Pre Post and BL periods defined in options
         optionsStats.intervals=criteria.lick;
-        [WilcStatsLick ,~ ,~]=unit_responses_stat_tests(currSpikes,currEventLick,optionsStats,options);
-        
+        [WilcStatsLick ,~ ,~]=unit_responses_stat_tests(currSpikes,currEventLick,optionsStats,'lick',options);
+        WilcStatsLick.criteria = optionsStats.('lick');
         DATA(Q).units(u).lickResponse.tests=WilcStatsLick;
         clearvars WilcStatsLick
         
         %%LOGIC TESTS FOR LICK CLASSIFICATION "TYPE"
         unit_lick_response_stats=DATA(Q).units(u).lickResponse;
-        [lick_response_struct,finalLightResponse] = classify_unit_light_type(unit_lick_response_stats);
+        [lick_response_struct,finalLickResponse] = classify_unit_light_type(unit_lick_response_stats);
         DATA(Q).units(u).lickResponse=lick_response_struct;
-        DATA(Q).units(u).finalLickResponse = finalLightResponse;
+        DATA(Q).units(u).finalLickResponse = finalLickResponse;
         clearvars type* lickTypeComb CRF
     end
 end
@@ -110,4 +110,6 @@ count_unit_responses_for_table
 
 fprintf('FINISHED.\nFor full workflow, run calc_spike_binned_data_remove_outliers.m\n');
 % fprintf('OR if only want counts of unit responses: count_unit_responses.m \n');
+clearCRFdata
+unit_light_classification_report;
 clearCRFdata

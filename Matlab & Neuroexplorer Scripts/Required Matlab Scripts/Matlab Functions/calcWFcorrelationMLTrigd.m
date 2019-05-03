@@ -99,15 +99,17 @@ while w<=length(WFs)
 
     WFs(w).stats.corrcoef.res=R;
     WFs(w).stats.corrcoef.Rsquare=R.^2;
+    WFs(w).stats.corrcoef.p_mat = P;
     WFs(w).stats.corrcoefPval=P(2);
-     
+     clearvars P R
     %%%%%%%%%%CALCULATE CROSS CORRELATION
     [xR xL]=xcorr(calcMatrix(:,1),calcMatrix(:,2),31,'coeff');
     
     WFs(w).stats.xcorr.res=xR;
     WFs(w).stats.xcorr.lag=xL;
+    WFs(w).stats.xcorr.pearsons_R = xR; 
     WFs(w).stats.xcorr.Rsquare=xR.^2;
-    WFs(w).stats.xcorrR=xR(32);
+    WFs(w).stats.xcorrR=xR(32); % 32 is where lag/xL==0;
 
     % %%%IS CRF WAVEFORM CRITERION 
     %     if xR(32)>=0.9

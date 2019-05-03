@@ -1,5 +1,5 @@
 
-function [WilcStats, optionsStats, options]=unit_responses_stat_tests(currSpikes,currEvent,optionsStats,options)
+function [WilcStats, optionsStats, options]=unit_responses_stat_tests(currSpikes,currEvent,optionsStats,light_or_lick,options)
 %% This function accepts a vector of spiketimes, eventtimes, options structure for JMI_spikeMatFun, and optionsStats structure for Wilcoxon intervals. 
 %Requires  function JMI_spkMatFun
 %%Inputs:
@@ -55,33 +55,33 @@ end
 WilcStats=struct();
 
 %%	Fill in values from options structure
-% pre     =  options.pre;
-% post    =  options.post;
-% fr      =  options.fr;
-% tb      =  options.tb;
-% binsize =  options.binsize;
-% chart   =  options.chart;
+pre     =  options.pre;
+post    =  options.post;
+fr      =  options.fr;
+tb      =  options.tb;
+binsize =  options.binsize;
+chart   =  options.chart;
 
 %%%Create Wilcoxon intervals with timeBins to determine indices for selecting data to compare
-% WilcBLint	= optionsStats.intervals.intBL_ms;
-% WilcPreInt	= optionsStats.intervals.intPre_ms;
-% WilcPostInt	= optionsStats.intervals.intPost_ms;
-% timeBins=[-pre:binsize:post-binsize];
-%%	Fill in values from code below:
-
-pre     =  100;%start of timeinterval(pre-event), left-inclusive
-post    =  100;%end of timeinterval(post-event), right-exlcuded(post-binsize)
-binsize = 5;
+WilcBLint	= optionsStats.(light_or_lick).intBL_ms;
+WilcPreInt	= optionsStats.(light_or_lick).intPre_ms;
+WilcPostInt	= optionsStats.(light_or_lick).intPost_ms;
 timeBins=[-pre:binsize:post-binsize];
-
-fr      =  1; % firing rate. if 1 then stats are divided by time to get rates
-tb      =  1;
-chart   =  2;
-
-% Time Periods for Wilcoxon Signed Rank Test
-WilcBLint	= [-100, -50];
-WilcPreInt	= [-50, 0];
-WilcPostInt	= [0, 50];
+% %%	Fill in values from code below:
+% 
+% pre     =  100;%start of timeinterval(pre-event), left-inclusive
+% post    =  100;%end of timeinterval(post-event), right-exlcuded(post-binsize)
+% binsize = 5;
+% timeBins=[-pre:binsize:post-binsize];
+% 
+% fr      =  1; % firing rate. if 1 then stats are divided by time to get rates
+% tb      =  1;
+% chart   =  2;
+% 
+% % Time Periods for Wilcoxon Signed Rank Test
+% WilcBLint	= [-100, -50];
+% WilcPreInt	= [-50, 0];
+% WilcPostInt	= [0, 50];
 
 %%Create spkMat - Matrix of PEH counts by trial 
 % [spkMat options] = JMI_spkMatFun(currSpikes,currEvent,options);

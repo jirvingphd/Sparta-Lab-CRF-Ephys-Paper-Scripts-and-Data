@@ -36,13 +36,22 @@ optionsStats.intervals.statBL=[-100 -50]; %%Baseline period for Wilcoxon test
 optionsStats.intervals.statPRE=[-50 0]; %%Pre-Event period for Wilcoxon test
 optionsStats.intervals.statPOST=[0 50];
 
+
 %% Light Response Criteria
-criteria=struct();
-criteria.light.intBL_ms=[-10 0]; %was -20 at some point
-criteria.light.intPre_ms=[-5 0];
-criteria.light.intPost_ms=[0 10];
+% criteria=struct();
+% criteria.light.intBL_ms=[-10 0]; %was -20 at some point
+% criteria.light.intPre_ms=[-5 0];
+% criteria.light.intPost_ms=[0 10];
+
+
+optionsStats.light.intBL_ms=[-10 0]; %was -20 at some point
+optionsStats.light.intPre_ms=[-5 0];
+optionsStats.light.intPost_ms=[0 10];
 
 %% Lick Repsonse Criteria
-criteria.lick.intBL_ms=[-100 -50];
-criteria.lick.intPre_ms=[-50 0];
-criteria.lick.intPost_ms=[0 50];
+% criteria.lick.intBL_ms=[-100 -50];
+% criteria.lick.intPre_ms=[-50 0];
+% criteria.lick.intPost_ms=[0 50];
+optionsStats.lick.intBL_ms=[-100 -50];
+optionsStats.lick.intPre_ms=[-50 0];
+optionsStats.lick.intPost_ms=[0 50];
