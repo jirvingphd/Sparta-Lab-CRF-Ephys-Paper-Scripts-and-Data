@@ -10,7 +10,7 @@
 %%Required document and filepath selection 
 doc=GetActiveDocument()
 path=GetDocPath(doc)
-savePPT="y"
+savePPT="Y"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%Get File Name and Path to Save Excel and PPT files to same directory, shorten excel name if its too long
@@ -55,9 +55,18 @@ numEvents=GetVarCount(doc,"event")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%RENAME EVENTS & MAKE INTERVAL FILTERS%%%%
-numEVT = GetVarCount(doc,"event")
+numEvents = GetVarCount(doc,"event")
+numMarkers = GetVarCount(doc,"marker")
+Trace(numEvents, numMarkers)
+if numMarkers > numEvents
+    var_type = "marker"
+    numEVT = numMarkers
+else
+    var_type = "event"
+    numEVT = numEvents
+end
 for j = 1 to numEVT
-    currEvt = GetVarName(doc,j,"event")
+    currEvt = GetVarName(doc,j, var_type)
     %numName= Right(fullName, 3)
     if Find(currEvt,"EVT25")>0
         doc.EventPulseUNFILT = doc.EVT25
