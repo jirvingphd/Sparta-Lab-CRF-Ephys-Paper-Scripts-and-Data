@@ -63,7 +63,7 @@ for s=1:length(sheets)
     tableOut = RATEStable(:,{'DATA_file_num','unit_num','lightType','lickType',varname});
     tableOut.FiringRateType=FiringRateType;
     tableOut=movevars(tableOut,'FiringRateType','Before',varname);
-    tableOut = splitvars(tableOut,varname,'NewVariableNames',binNames);
+    tableOut = splitvars(tableOut,varname,'NewVariableNames',binNames(1:size(tableOut.(varname),2)));
  
     writetable(tableOut,'firing_rate_tables.xlsx','Sheet',sheetname)
 end

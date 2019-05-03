@@ -141,6 +141,7 @@ if isfile(excelfilename)
 end
 writetable(RESULTS_TABLE,excelfilename)
 
+fprintf('If you have not run pre_data_for_norm_firing_fig.m, run now.\nElse, run plot_normalized_firing_CRF_by_lick_types.\n')
 clearCRFdata
 % ERRunitsOut=[];
 % % j=2;

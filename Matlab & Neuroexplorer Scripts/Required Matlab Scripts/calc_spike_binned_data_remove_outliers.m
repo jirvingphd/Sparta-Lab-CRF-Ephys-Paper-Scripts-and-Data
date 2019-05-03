@@ -559,4 +559,4 @@ if strcmpi(save_data,'y')
     end
 end
 
-fprintf('Next, run prep_data_for_norm_firing_fig.m\n')
+fprintf('Next, if want to export results to excel: run print_results_table_to_excel.m\nElse run prep_data_for_norm_firing_fig.m\n')

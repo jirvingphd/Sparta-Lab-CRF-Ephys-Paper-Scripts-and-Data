@@ -23,12 +23,22 @@ doc=GetActiveDocument()
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%RENAME EVENTS & MAKE INTERVAL FILTERS%%%%
-numEVT = GetVarCount(doc,"event")
+numEvents = GetVarCount(doc,"event")
+numMarkers = GetVarCount(doc,"marker")
+Trace(numEvents, numMarkers)
+if numMarkers > numEvents
+    var_type = "marker"
+    numEVT = numMarkers
+else
+    var_type = "event"
+    numEVT = numEvents
+end
 for j = 1 to numEVT
-    currEvt = GetVarName(doc,j,"event")
+    currEvt = GetVarName(doc,j, var_type)
     %numName= Right(fullName, 3)
     if Find(currEvt,"EVT25")>0
-        doc.EventPulseUNFILT = doc.EVT25
+        Trace("EVT25 found")
+        doc["EventPulseUNFILT"] = doc["EVT25"]
         doc["EventPulse"] = ISIFilter(doc["EventPulseUNFILT"], 0.01)
         
         %%Make interval filters around EventPulse        
@@ -39,20 +49,22 @@ for j = 1 to numEVT
         %Select(doc,GetVarByName(doc,"IntFilter_NOT_IntPulse10ms"))
         %SendSelectedVarsToMatlab(doc)
         %DeselectAll(doc)
+    else
+        Trace("EVT25 not found")
     end
     
     if Find(currEvt,"EVT09")>0
-    doc.EventTrain = doc.EVT09
+        doc.EventTrain = doc.EVT09
     end
 
 
     if Find(currEvt,"EVT04")>0
-    doc.EventMEDttl= doc.EVT04
+        doc.EventMEDttl= doc.EVT04
     end
     
     if Find(currEvt,"EVT03")>0
-    doc.EventLickRAW = doc.EVT03
-    doc["EventLick"] = Shift(doc["EventLickRAW"], -0.003)
+        doc.EventLickRAW = doc.EVT03
+        doc["EventLick"] = Shift(doc["EventLickRAW"], -0.003)
     end
 
 
@@ -92,6 +104,7 @@ for j = 1 to numEVT
     end
     
 end
+
 %Select(GetVarByName(d)
 % doc.IntFilter_IntPulse5ms = MakeIntervals(doc.EventPulse, 0, 0.005)
 doc.IntFilter_IntPulse10ms = MakeIntervals(doc.EventPulse, 0, 0.01)
