@@ -1,9 +1,9 @@
-%findDATAoutliersFromSpikes.m
+%calc_spike_binned_data_remove_outliers.m
+fprintf('User may want to change parameters at start of script.\n')
+remove_outliers_between_units = false;
+plot_comparisons = false;
 
-% OUTLIERSfull=struct();
 varsAtStart=[who];
-
-
 %% Now use COUNTS to process data
 OUTLIERSfull=struct();
 SPIKES=struct();
@@ -71,15 +71,17 @@ for l=1:length(lightTypes)
             % Add new unit's cut spike data combinedDataMat (for finding OUTLIERSfull)
             
             currDataToAdd=NaN(1,48);
+            cutBinsToAdd = nan(1,48);
+
             cutData=cutDataCounts./binsize;
             currDataToAdd(1:length(cutData))=cutData; %add to combinedDataMat AND SPIKES...cutSpikeRate
-            
+            cutBinsToAdd(1:length(cutBins))=cutBins; 
             %THIS IS WHERE LICK TYPE DATA MATRIX IS COMPLETE
             combinedDataMat(c,1:48)=currDataToAdd(1:48);%THIS LINE MUST BE DIFFERENT TO SAVE RAW
             combinedDataMatRawSAVE=combinedDataMat;
             
             OUTLIERSfull.(currLightType).(currLickType).rawData= combinedDataMatRawSAVE;
-            OUTLIERSfull.(currLightType).(currLickType).binsRaw= cutBins;
+            OUTLIERSfull.(currLightType).(currLickType).binsRaw= cutBinsToAdd;
             
             
             
@@ -87,7 +89,7 @@ for l=1:length(lightTypes)
             SPIKES(currQ).units(currU).spikeTimes=[]; %timestamps;
             SPIKES(currQ).units(currU).cutSpikeRate=currDataToAdd;
             SPIKES(currQ).units(currU).cutSpikeCounts=cutDataCounts;
-            SPIKES(currQ).units(currU).cutBinEdges=cutBins;
+            SPIKES(currQ).units(currU).cutBinEdges=cutBinsToAdd;
             SPIKES(currQ).units(currU).uncutSpikes=binnedData;
             SPIKES(currQ).units(currU).uncutBinEdges=spikeTimebins;
             SPIKES(currQ).units(currU).binsToKeep=tsBinsToKeep;
@@ -178,20 +180,26 @@ for l=1:length(lightTypes)
         testData= data;
         testDataIdx=dataIdx;
         
-        %% OUTLIER REMOVAL%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%OUTLIER REMOVAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         clearvars TF* T1 T2 cleaned I J loc cleaned* comb*
         
-        %%%OUTLIER FIND & FILL 1 (within rows)
+        %% %OUTLIER FIND & FILL 1 (within rows)
+%         keyboard
+%         [cleanedData1, TF1, lower1, upper1,center1]=filloutliers(testData(:,1:48),'linear','movmedian',12,2); %48 bc 48 =4 hours % NEW ON 05/02/19 just checking
         [cleanedData1, TF1, lower1, upper1,center1]=filloutliers(testData(:,1:48),'linear','movmedian',6,2); %48 bc 48 =4 hours
+%         [fig, ax1, ax2] = plot_compare(testData,cleanedData1)
+
         OUTLIERSfull.(currLightType).(currLickType).remSessOutTF1=TF1;
         T1=find(TF1);
         fprintf('# outlier timebins: light-%s, lick-%s: \n   Pass 1:  %d\n',currLightType,currLickType,length(T1));
         
-        %%%OUTLIER FIND 2 (column wise (by time bins))
+        %% %OUTLIER FIND 2 (column wise (by time bins))
         [TF2]=isoutlier(cleanedData1,'mean'); %operates on each column separately
         T2=find(TF2);
-        fprintf('   Pass 2: %d \n\n\n',length(T2));
+        if remove_outliers_between_units==true
+            fprintf('   Pass 2: %d \n\n\n',length(T2));
+        end
         
         %save the location of the OUTLIERSfull in subscripts
         [I, J]=find(TF2>=1);
@@ -204,11 +212,17 @@ for l=1:length(lightTypes)
         
         cleanedData1_OUTLIERSfullNaN=[];
         cleanedData1_OUTLIERSfullNaN=cleanedData1;
-        cleanedData1_OUTLIERSfullNaN(TF2==1)=NaN; %This is where entire CRF.inhibited. #3 is problem and becomes NaN
+        
+        if remove_outliers_between_units==true
+            fprintf('remove_outliers_between_units is true.\n')
+            cleanedData1_OUTLIERSfullNaN(TF2==1)=NaN; %This is where entire CRF.inhibited. #3 is problem and becomes NaN
+        else
+            fprintf('remove_outliers_between_units is false.\n')
+        end
         
         
         %%Insert NaN removal again
-        delData=[]; testData=[];
+        delData=[]; %testData=[];
         data=cleanedData1_OUTLIERSfullNaN;
         for d=1:size(data,1)-1
             
@@ -236,6 +250,12 @@ for l=1:length(lightTypes)
         combinedDataMat(~any(~isnan(data),2),:)=[];%removes any lines filled with NaN
         dataIdx(~any(~isnan(data),2),:)=[];%removes any lines filled with NaN
         
+        
+%         % IMPORTANT DECISION POINT
+%         if remove_outliers_between_units == true
+%             currData = combinedDataMat;
+%         elseif remove_outliers_between_units== false
+%             currData = 
         %%% OUTLIER REPLACEMENT 2 (across row OUTLIERSfull, filled via row)
         currData=combinedDataMat;
         [currDataFilled]=fillmissing(currData,'linear',2);
@@ -243,9 +263,16 @@ for l=1:length(lightTypes)
         %%SAVE OUTLIERS DATA
         %[i]     %NOTE: The data filled in here will be used for all subsequent  analysis.
         %to change data used for normalized firing and prism, change what is filled in OUTLIERSfull...cleanedData
-        OUTLIERSfull.(currLightType).(currLickType).cleanedData= currDataFilled;
+        if plot_comparisons==true
+            [fig] = plot_compare(testData,cleanedData1,currDataFilled,currLightType,currLickType); %[fig, ax1, ax2, ax3] = 
+        end
+%         keyboard
+        OUTLIERSfull.(currLightType).(currLickType).remove_outliers_between_units = remove_outliers_between_units;
+        OUTLIERSfull.(currLightType).(currLickType).cleandData_1 = cleanedData1;
+        OUTLIERSfull.(currLightType).(currLickType).cleanedData_2= currDataFilled;
+        OUTLIERSfull.(currLightType).(currLickType).cleanedData = currDataFilled;
         OUTLIERSfull.(currLightType).(currLickType).cleanedDataIdx= dataIdx;
-        
+        testData=[];
     end
 end
 clearvars curr* temp* data*
@@ -491,6 +518,21 @@ if exist('BURSTunits','var')
     calc_perc_bursts_by_hour
 end
 
+
+% fprintf('Initial phase of spike analysis complete.\n Next phase is Burst Analysis with NeuroExplorer.\n Run makeUnitTimestampVarsForAll.m\n')
+% clearvars -except DATA* BURST* COUNTS* CRF* options* PLOT* RATES* SORT* ERR* OUTLIER* SPIKE* CORR* LICKS* corr* SPIKES
+clearCRFdata
+%% 
+
+fprintf('\nNow running make_RATES_structure_and_table.m\n')
+make_RATES_structure_and_table
+
+fprintf('Now running calculate_corr_spikes_bursts_licks.m\n')
+calculate_corr_spikes_bursts_licks
+
+fprintf('\nClearing unneeded data structures (BURSTS, COUNTStoPLOT, RATEStrans')
+clearvars BURSTS COUNTStoPlot RATEStrans
+
 %% Save
 save_data = input('Initial phase of spike analysis complete...\nSave data file now?(y/n):\n','s');
 if strcmpi(save_data,'y')
@@ -517,8 +559,4 @@ if strcmpi(save_data,'y')
     end
 end
 
-% fprintf('Initial phase of spike analysis complete.\n Next phase is Burst Analysis with NeuroExplorer.\n Run makeUnitTimestampVarsForAll.m\n')
-% clearvars -except DATA* BURST* COUNTS* CRF* options* PLOT* RATES* SORT* ERR* OUTLIER* SPIKE* CORR* LICKS* corr* SPIKES
-clearCRFdata
-% fprintf('\nNow run calc_perc_bursts_by_hour.m\n')
-
+fprintf('Next, run prep_data_for_norm_firing_fig.m\n')

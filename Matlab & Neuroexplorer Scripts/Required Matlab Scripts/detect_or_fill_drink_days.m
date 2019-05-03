@@ -1,60 +1,64 @@
 %%nexDATA_fillDrinkDay
 % fprintf('First running renameDATAfileinfoDrinkTypeDay')
 % user_choice = input('Detect drink and day from filenames?:(y/n)\n','s');
-user_choice='y'
 %% Detect from filenames
-TEST = struct();
-if strcmpi(user_choice,'y')
-    for Q=1:length(DATA)
+for Q=1:length(DATA)
+    
+    check_drink='both';
+    
+    if isempty(DATA(Q).fileinfo.drinkType)
         
-        check_drink=[];
-
-        if isempty(DATA(Q).fileinfo.drinkType)
+        if isempty(DATA(Q).fileinfo.drinkDay)
             
-            if isempty(DATA(Q).fileinfo.drinkDay)
-                
-                check_drink = 'both';
-                
-            else
-                
-                check_drink = 'drink';
-                
-            end
+            check_drink = 'both';
             
-        elseif isempty(DATA(Q).fileinfo.drinkDay)
+        else
             
-            check_drink = 'day';
+            check_drink = 'drink';
+            
         end
         
-        [fileinfo_updated] = detect_drink_type_and_day(DATA(Q).fileinfo,check_drink);
-        DATA(Q).fileinfo=fileinfo_updated;
-%         TEST(Q).fileinfo=fileinfo_updated;
-        %         curr_file = DATA(Q).fileinfo.filename;
-        %
-        %         %%Detect drink
-        %         drink_type=NaN;
-        %         if contains(curr_file,'water')
-        %             drink_type = 'water';
-        %         elseif contains(curr_file, 'ethanol')
-        %             drink_type = 'ethanol';
-        %         elseif contains(curr_file,'sucr')
-        %             drink_type = 'sucrose';
-        %         else
-        %             fprintf('Drink name not found.\n')
-        %         end
-        %         fprintf('File %d: drinkType=%s',Q,drink_type);
-        %         %%Detect day
-        % %         [match] = regexpi(curr_file,'(day.?\d{1,2})','match');
-        %         [tokens] = regexpi(curr_file,'(day)[\_\-\s]{1,}(\d{1,2})','tokens');
-        %         drink_day=NaN;
-        %         if isempty(tokens)
-        %             fprintf('No day number found.\n')
-        %         else
-        %             drink_day = tokens{1}{2};
-        %         end
-        %         DATA(Q).fileinfo.drinkType = drink_type;
-        %         DATA(Q).fileinfo.drinkDay = drink_day;
+    elseif isempty(DATA(Q).fileinfo.drinkDay)
+        
+        check_drink = 'day';
     end
+    
+    [fileinfo_updated] = detect_drink_type_and_day(DATA(Q).fileinfo,check_drink);
+    DATA(Q).fileinfo=fileinfo_updated;
+    %         TEST(Q).fileinfo=fileinfo_updated;
+    %         curr_file = DATA(Q).fileinfo.filename;
+    %
+    %         %%Detect drink
+    %         drink_type=NaN;
+    %         if contains(curr_file,'water')
+    %             drink_type = 'water';
+    %         elseif contains(curr_file, 'ethanol')
+    %             drink_type = 'ethanol';
+    %         elseif contains(curr_file,'sucr')
+    %             drink_type = 'sucrose';
+    %         else
+    %             fprintf('Drink name not found.\n')
+    %         end
+    %         fprintf('File %d: drinkType=%s',Q,drink_type);
+    %         %%Detect day
+    % %         [match] = regexpi(curr_file,'(day.?\d{1,2})','match');
+    %         [tokens] = regexpi(curr_file,'(day)[\_\-\s]{1,}(\d{1,2})','tokens');
+    %         drink_day=NaN;
+    %         if isempty(tokens)
+    %             fprintf('No day number found.\n')
+    %         else
+    %             drink_day = tokens{1}{2};
+    %         end
+    %         DATA(Q).fileinfo.drinkType = drink_type;
+    %         DATA(Q).fileinfo.drinkDay = drink_day;
+end
+
+files_missing_drinkType=[];
+for Q=1:length(DATA)
+    if isempty(DATA(Q).fileinfo.drinkType) || any(isnan(DATA(Q).fileinfo.drinkType))
+        files_missing_drinkType = [files_missing_drinkType, Q];
+    end
+    fprintf('DATA(%d).fileinfo.drinkType = %s, drinkDay=%s.\n',Q,DATA(Q).fileinfo.drinkType,DATA(Q).fileinfo.drinkDay);
 end
 % else
 % %% Manually fill.

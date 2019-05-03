@@ -115,7 +115,7 @@ for Q=1:length(DATA)
 end
 
 fprintf('Clearing variables except those defined in "clearCRFdata.m"...\n')
-fprintf('Running counts2table')
+fprintf('Running counts2table.\n')
 counts2table
 clearCRFdata
 

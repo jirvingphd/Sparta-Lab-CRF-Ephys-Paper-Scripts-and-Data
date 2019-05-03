@@ -29,7 +29,7 @@ for c=1:length(class_types)
     end
 end
 
-fprintf('Displaying contents of COUNTS_table.')
+fprintf('Displaying contents of COUNTS_table.\n')
 count_fields = fieldnames(COUNTS_table);
 for c=1:length(count_fields)
     disp(COUNTS_table.(count_fields{c}))

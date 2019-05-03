@@ -14,7 +14,6 @@ Sleep(500)
 numVars= GetVarCount(doc,"neuron")
 for j = 1 to numVars
     fullName = GetVarName(doc,j,"neuron")
-    Trace(fullName)
     if Find(fullName,"Unit")>0
 %    doc[fullName+"BurstSpikes"] = IntervalFilter(doc[fullName], doc[fullName+"_bursts"])
 %    doc[fullName+"IntNonBurst"] = IntOpposite(doc, doc[fullName+"_bursts"])

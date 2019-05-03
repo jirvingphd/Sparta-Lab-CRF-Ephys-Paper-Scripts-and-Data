@@ -16,16 +16,16 @@ curr_file = fileinfo.filename;
 if strcmpi(type_day_or_both,'both') || strcmpi(type_day_or_both,'drink')
 %%Detect drink
     drink_type=NaN;
-    if contains(curr_file,'water')
+    if contains(curr_file,'water','IgnoreCase',true)
         drink_type = 'water';
-    elseif contains(curr_file, 'ethanol')
+    elseif contains(curr_file, 'ethanol','IgnoreCase',true) || contains(curr_file,'etoh','IgnoreCase',true)
         drink_type = 'ethanol';
-    elseif contains(curr_file,'sucr')
+    elseif contains(curr_file,'sucr','IgnoreCase',true)
         drink_type = 'sucrose';
     else
         fprintf('Drink name not found.\n')
     end
-    fprintf('File %s: drinkType=%s',curr_file,drink_type);
+    fprintf('File %s: drinkType=%s\n',curr_file,drink_type);
 end
 
 %%Detect day

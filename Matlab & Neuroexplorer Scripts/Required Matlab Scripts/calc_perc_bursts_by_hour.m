@@ -219,7 +219,7 @@ for Q=1:length(DATA)
         end
         
         tempSpikesStruct.percSpikesInBursts.burstingByHour=burstingByHour;
-        fprintf('BURSTunits(%d).units(%d).BURSTstats created.\n',Q,u)
+%         fprintf('BURSTunits(%d).units(%d).BURSTstats created.\n',Q,u)
         BURSTunits(Q).units(u).BURSTstats=tempSpikesStruct;
         BURSTunits(Q).units(u).outliers=currOutliers;
         
@@ -238,7 +238,7 @@ statsToRun={'SpikesInBurst','MeanISIinBurst','PeakFreqInBurst','BurstDuration','
 
 for Q=1:length(BURSTunits)
     if DATA(Q).fileinfo.include==0
-        fprintf('Skipping DATA(%d) since include==0',Q)
+        fprintf('Skipping DATA(%d) since include==0\n',Q)
         continue
     end
     %Find and take DIDSessionInts
@@ -255,7 +255,7 @@ for Q=1:length(BURSTunits)
         
         % Extract the data to calculate binned averages from
         if DATA(Q).units(u).include==0
-            fprintf('DATA(%d).units(%d).include==0.\n',Q,u)
+            fprintf('Skipping DATA(%d).units(%d), include==0.\n',Q,u)
             continue
         end
         

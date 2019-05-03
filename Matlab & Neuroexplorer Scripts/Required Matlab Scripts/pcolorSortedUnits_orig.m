@@ -81,7 +81,9 @@ axes1 = axes('Parent',figObj);%,...
     
 [nUnits, nBinsData]=size(dataToPlot);
 nBins=4*hourSec/binsize;
-
+if size(dataToPlot,1)<2
+    error('There is only 1 unit to plot. Cannot use pcolor plotting method.\n')
+end
 hp=pcolor(dataToPlot); %changed from surf plot on 06/02/17
 a=gca;
 %hp=surf(dataToPlot)

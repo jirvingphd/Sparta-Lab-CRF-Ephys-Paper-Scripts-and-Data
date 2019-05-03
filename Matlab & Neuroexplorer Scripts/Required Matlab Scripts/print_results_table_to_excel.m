@@ -1,5 +1,8 @@
 %printUnitNamesDetails_struct.m
-
+%% Export RATEStables first
+fprintf('Export rates tables using rates_tables_to_excel.m\n')
+rates_table_to_excel
+%% Export unit details 
 P=struct();
 row = 0;
 for Q=1:length(DATA)
@@ -129,11 +132,12 @@ end
 % % P{1,10}='Spk/sec-Full4Hr';
 
 RESULTS_TABLE = struct2table(P);
-excelfilename = 'Unit Results Summary Table.xlsx'
+basename = 'Unit Results Summary Table';
+excelfilename = strcat(basename,'.xlsx');
 if isfile(excelfilename)
     [date]=clock;
     dateName=sprintf('%02d%02d%04d_%02dh%02dm',date(2),date(3),date(1),date(4),date(5));    
-    excelfilename = [excelfilename+dateName]
+    excelfilename = strcat(basename,dateName,'.xlsx')
 end
 writetable(RESULTS_TABLE,excelfilename)
 

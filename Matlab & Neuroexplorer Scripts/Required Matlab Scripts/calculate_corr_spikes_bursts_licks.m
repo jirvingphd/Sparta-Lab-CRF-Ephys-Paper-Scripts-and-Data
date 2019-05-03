@@ -15,7 +15,7 @@ CORRlicks=struct();
 
 %% SPIKES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fprintf('currLickData will be reused multiple times as...\n')
+% fprintf('currLickData will be reused multiple times as...\n')
 % listLickDataToRun={'cutLickRate','cutLickCounts','cumSumLicks'};
 listLickDataToRun={'cutLickRate','cumSumLicks'}; %Removed cutLickCounts becuase results are the same as rate
 
@@ -111,10 +111,10 @@ end
 %% ANALYZE BURST VS LICK DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % listLickDataToRun={'cutLickRate','cumSumLicks'}; %Already defined
 
-if exist('BURSTunits','var')==0
-    fprintf('BURSTunits structure does not exist. Skipping burst correlations.\n')
-    return
-end
+% if exist('BURSTunits','var')==0
+%     fprintf('BURSTunits structure does not exist. Skipping burst correlations.\n')
+%     return
+% end
 if isfield(BURSTunits(1).units(1),'file_num')
     if isfield(BURSTunits(1).units(1),'lightType')==0
         for B=1:length(BURSTunits)
@@ -240,6 +240,7 @@ for currQ=1:length(BURSTunits)
     end
 end
 % end
-
+fprintf('You may now run print_results_table_to_excel.m\n')
+fprintf('To continue plotting run prep_data_for_norm_firing_fig.\n')
 % clearvars -except DATA* BURST* COUNTS* CRF* options* PLOT* RATES* SORT* ERR* OUTLIER* CORR* LICK* SPIKES
 clearCRFdata
