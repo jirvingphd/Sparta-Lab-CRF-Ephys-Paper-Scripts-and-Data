@@ -74,6 +74,8 @@ that are complete as of today 02/06/19.
         - If ethanol, add day## as well. 
     3. Put all nex files in the same folder and launch Matlab. 
 7.  MATLAB WORKFLOW:
+
+
 | ﻿Run By User | Order |                 Simplified Script Name                |                                             Description                                            |
 |:-----------:|:-----:|:-----------------------------------------------------:|:--------------------------------------------------------------------------------------------------:|
 |      Y      |   1   |          import_nex_files_spikes_and_bursts.m         | Saves all units neurons events and intervals into DATA. calculates BURSTunits. Runs Nex templates. |
