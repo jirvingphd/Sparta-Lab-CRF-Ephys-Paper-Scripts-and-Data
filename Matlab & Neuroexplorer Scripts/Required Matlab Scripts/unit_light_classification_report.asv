@@ -8,8 +8,6 @@ report{1,5}='spike_p_val';
 report{1,6}='spikes_rate_change';
 report{1,7} = 'wave_p_val';
 report{1,8} = 'waves_pearson_R';
-report{1,9} = 'filename';
-
 row = 2;
 for Q=1:length(DATA)
     for u=1:length(DATA(Q).units)
@@ -18,25 +16,23 @@ for Q=1:length(DATA)
         report{row,2} = DATA(Q).units(u).finalLightResponse;%'light_type';
         % spikes
         spike_p = DATA(Q).units(u).lightResponse.tests.PrePost.p;%'PreVsPost_pulse_spikes_p_val';
-        report{row,3}= spike_p<.05;
-
         report{row,5}=spike_p;%'PreVsPost_pulse_spikes_p_val';
+        report{row,3}= spike_p<.05;
         report{row,6}=DATA(Q).units(u).lightResponse.tests.PrePost.PrePostChange;%'PreVsPost_pulse_spikes_rate_change';
         
         % waves
         if any(isempty(DATA(Q).units(u).lightResponse.tests.waves))
             report{row,6} = NaN;
-            report{row,4} = false;
+            report{row,7} = false;
             report{row,8} = NaN;
         else
             
             wave_p = DATA(Q).units(u).lightResponse.tests.waves.corrcoefPval;%'waves:p_val';
-            report{row,4} = wave_p<.05;
-            report{row,7} = wave_p;%'waves:p_val';
+            report{row,6} = wave_p;%'waves:p_val';
+            report{row,7} = wave_p<.05;
             report{row,8} =  DATA(Q).units(u).lightResponse.tests.waves.xcorrR;%'waves:pearson_R';
        
         end
-        report{row,9}=DATA(Q).fileinfo.filename;
 %         report{row,1} = [Q,u];
 %         report(row,2:width(light_type_response.spike_tests) = struct2table(light_type_response.spike_tests,'AsArray',true);
 %         report{row,3} = struct2table(light_type_response.wave_tests,'AsArray',true);
@@ -47,5 +43,4 @@ end
 REPORT_light_classification = cell2table(report(2:end,:),'VariableNames',report(1,:))
 clearvars report
 %         lick_type = DATA(Q).units(u).finalLickResponse;
-clearCRFdata
         
