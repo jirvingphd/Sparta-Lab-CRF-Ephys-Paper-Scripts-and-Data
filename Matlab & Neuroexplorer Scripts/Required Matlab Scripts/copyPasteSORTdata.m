@@ -5,10 +5,10 @@
 %%Y1:length(currLickType)
 
 
-% SORTtrackerCRF.(currLickType).sortedData.
+% SORTtracker_CRF.(currLickType).sortedData.
 
-if exist('SORTtrackerCRF','var')==0
-    SORTtrackerCRF=SORTtracker_SplitByRateChange.CRF;
+if exist('SORTtracker_CRF','var')==0
+    SORTtracker_CRF=SORTtracker.CRF;
 end
 %% copy Full Norm FIring Data
 
@@ -19,12 +19,12 @@ copyNormFiringFull={};
 	copyNormFiringFull(2:length(timebins)+1,1)=num2cell(timebins);%,size(timebins)); %make an array of ones equal to length of data to fill in 1 entry per line
     j=2;
 
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
     
 for s = 1:length(sortFields)
     currLickType=sortFields{s};    
 
-    % copy=SORTtrackerCRF.(curr.sortedData.sortedRateDataToPlot
+    % copy=SORTtracker_CRF.(curr.sortedData.sortedRateDataToPlot
 
     % 	copy=num2cell(T(:),2)
 %     	currCopy = num2cell(currData,size(currData));
@@ -32,7 +32,7 @@ for s = 1:length(sortFields)
 %%% To fill in a column of a cell array with values from a matrix (making paste-able cell array for prism/excel)
 	j=j+1;
     
-    currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedRateDataToPlot;
+    currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedRateDataToPlot;
     c=1;
     while c<=size(currDataMat,1)
         
@@ -61,12 +61,12 @@ timebins=[0:5:235];
 
     j=2;
 temp=struct();
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
 for s = 1:length(sortFields)
     currLickType=sortFields{s};    
         j=j+1;
 
-            currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedRateDataToPlot';
+            currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedRateDataToPlot';
             binnedResults=[];
             for h=1:length(timeBlockBins60Mins)
                 includeCurrHour=[];
@@ -124,12 +124,12 @@ clearvars timebins curr* cut*
 % 
 %     j=2;
 % temp=struct();
-% sortFields=fieldnames(SORTtrackerCRF);
+% sortFields=fieldnames(SORTtracker_CRF);
 % for s = 1:length(sortFields)
 %     currLickType=sortFields{s};    
 %         j=j+1;
 % 
-%             currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedRateDataToPlot';
+%             currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedRateDataToPlot';
 %             binnedResults=[];
 %             for h=1:length(timeBlockBins30Mins)
 %                 includeCurrHour=[];
@@ -186,14 +186,14 @@ copyRawRatesFull={};
     copyRawRatesFull(2:length(timebins)+1,1)=num2cell(timebins);%,size(timebins)); %make an array of ones equal to length of data to fill in 1 entry per line
     j=2;
 
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
     
 for s = 1:length(sortFields)
     currLickType=sortFields{s};    
 
     %%% To fill in a column of a cell array with values from a matrix (making paste-able cell array for prism/excel)
     
-    currDataMat=SORTtrackerCRF.(currLickType).preSortData.rawRatesCleaned;
+    currDataMat=SORTtracker_CRF.(currLickType).preSortData.rawRatesCleaned;
     j=j+1;
     c=1;
 
@@ -220,12 +220,12 @@ timebins=[0:5:235];
 
     j=2;
 temp=struct();
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
 for s = 1:length(sortFields)
     currLickType=sortFields{s};    
         j=j+1;
 
-            currDataMat=SORTtrackerCRF.(currLickType).preSortData.rawRatesCleaned';
+            currDataMat=SORTtracker_CRF.(currLickType).preSortData.rawRatesCleaned';
             binnedResults=[];
             for h=1:length(timeBlockBins60Mins)
                 includeCurrHour=[];
@@ -285,12 +285,12 @@ clearvars timebins curr* cut*
 % 
 %     j=2;
 % temp=struct();
-% sortFields=fieldnames(SORTtrackerCRF);
+% sortFields=fieldnames(SORTtracker_CRF);
 % for s = 1:length(sortFields)
 %     currLickType=sortFields{s};    
 %         j=j+1;
 % 
-%             currDataMat=SORTtrackerCRF.(currLickType).preSortData.rawRatesCleaned';
+%             currDataMat=SORTtracker_CRF.(currLickType).preSortData.rawRatesCleaned';
 %             binnedResults=[];
 %             for h=1:length(timeBlockBins30Mins)
 %                 includeCurrHour=[];
@@ -345,7 +345,7 @@ timebins=[0:5:235];
 copyPercBurstFull(2:length(timebins)+1,1)=num2cell(timebins); %,size(timebins)); %make an array of ones equal to length of data to fill in 1 entry per line
 j=2;
 
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
 
 for s = 1:length(sortFields)
     currLickType=sortFields{s};
@@ -354,8 +354,8 @@ for s = 1:length(sortFields)
     
     %%% To fill in a column of a cell array with values from a matrix (making paste-able cell array for prism/excel)
     j=j+1;
-    currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedPercBurstDataToPlot;
-%     currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedRateDataToPlot;
+    currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedPercBurstDataToPlot;
+%     currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedRateDataToPlot;
     c=1;
     while c<=size(currDataMat,1)
         
@@ -374,12 +374,12 @@ timebins=[0:5:235];
 
 j=2;
 temp=struct();
-sortFields=fieldnames(SORTtrackerCRF);
+sortFields=fieldnames(SORTtracker_CRF);
 for s = 1:length(sortFields)
     currLickType=sortFields{s};
     j=j+1;
- currDataMat=SORTtrackerCRF.(currLickType).sortedData.sortedPercBurstDataToPlot';
-%     currDataMat=SORTtrackerCRF.(currLickType).sortedData.';
+ currDataMat=SORTtracker_CRF.(currLickType).sortedData.sortedPercBurstDataToPlot';
+%     currDataMat=SORTtracker_CRF.(currLickType).sortedData.';
     binnedResults=[];
     for h=1:length(timeBlockBins60Mins)
         includeCurrHour=[];

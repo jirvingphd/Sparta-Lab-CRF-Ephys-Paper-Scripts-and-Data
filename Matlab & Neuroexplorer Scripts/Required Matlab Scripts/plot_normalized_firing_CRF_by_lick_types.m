@@ -10,7 +10,9 @@ end
 binsize=300; %how many seconds does each cell represent
 baselinePeriod=1800;%will be divided by binsize
 blEnd=baselinePeriod/binsize;
-SORTtracker_CRF = SORTtracker.CRF;
+if exist('SORTtracker_CRF','var')==0
+    SORTtracker_CRF = SORTtracker.CRF;
+end
 %% Prepare dataSortedToPlot matrices and add to SORTtracker_CRF
 responseFields=fieldnames(SORTtracker_CRF);
 for r = 1:length(responseFields)

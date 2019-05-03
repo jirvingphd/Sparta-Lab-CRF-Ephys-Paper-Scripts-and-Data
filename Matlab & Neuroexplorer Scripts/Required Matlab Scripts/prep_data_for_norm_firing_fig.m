@@ -564,7 +564,7 @@ hold off
 
 
 clearCRFdata
-
+SORTtracker_CRF= SORTtracker.CRF;
 fprintf('To make normalized firing plot for CRF units by lick type,\nrun plot_normalized_firing_CRF_by_lick_types.m')
 % SORTtracker_SplitByRateChange=SORTtracker;
 % clearvars h* curr* split* a c add* bin* c cax* cluster* cMean* comb* concat* dataSplit lick* light* maxlist slope searchFor sNonCRF rate* res* sorted* tit u Q *label* std* dataTo* intercept max* min* med* nBin* nUnit* p  s sCRF xt zScored* spaceRow *ToAdd o
