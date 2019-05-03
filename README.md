@@ -65,14 +65,30 @@ that are complete as of today 02/06/19.
         - On Templates Tab: select fodler - [This
     Repo& Neuroexplorer ScriptsNex Files]
 
-
-1.  WORK IN PROGRESS
-
-    -   The new simplified workflow is being completed now.
-
-    -   Currently (as of 04/26/19), there is a bug (that does not cause an
-        error, so user would not notice it)
-
-        -   When Importing the results of the bursting analysis, some cells that
-            have burst intervals do not return burst events (the
-            BurstSpikes,etc.)
+6.  PRE-MATLAB WORKFLOW INSTRUCTIONS.
+    1.  Make sure all nex files have a DIDSessionInts interval.
+        - Pick an interval without phototagging. 
+        - Generally if PT done post-session and no problems:
+            - DIDSessionInts=0 14400
+    2.  Edit the filenames so they include 'ethanol','sucrose', or 'water'.
+        - If ethanol, add day## as well. 
+    3. Put all nex files in the same folder and launch Matlab. 
+7.  MATLAB WORKFLOW:
+| ﻿Run By User | Order |                 Simplified Script Name                |                                             Description                                            |
+|:-----------:|:-----:|:-----------------------------------------------------:|:--------------------------------------------------------------------------------------------------:|
+|      Y      |   1   |          import_nex_files_spikes_and_bursts.m         | Saves all units neurons events and intervals into DATA. calculates BURSTunits. Runs Nex templates. |
+|      N      |   1B  |                 minimal_burst_analysis                |               Separates  nexResults for bursting analysis into BURSTunits structure.               |
+|      Y      |   2   |             calculate_light_lick_responses            |            Process each unit's timestamps to calssify its lick and light-responsiveness            |
+|      N      |   2B  | detect_or_fill_drink_day.m / deect_drink_type_and_day |                   Automatically recognizes drink type and day # from file names.                   |
+|      N      |   2C  |             count_unit_responses_for_table            |            Creates a structure of tables with the count of all light and lick responses.           |
+|      Y      |   3   |        calc_spike_binned_data_remove_outliers.m       | Uses rolling window to calculate outlier-removed binned data. Runs counts_unit_responses_for_table |
+|      N      |   3B  |                calc_perc_bursts_by_hour               |                              Calcualtes % of spikes in bursts by hour.                             |
+|      N      |   3C  |            make_RATES_structure_and_table.m           |                     Makes RATEScut structure and triggers rates_table_to_excel                     |
+|      N      |   3D  |                  rates_table_to_excel                 |                           export firing rates data to excel spreadsheets.                          |
+|      N      |   3E  |           calculate_corr_spikes_bursts_licks          |                          calcualtes corerlations between spikes and licks                          |
+|      Y      |   4   |             print_results_table_to_excel.m            |                              prints out a table of all unit's results                              |
+|      Y      |   5   |             prep_data_for_norm_firing_fig             |               Calculates normalized firing data and creates structures for color plot              |
+|      Y      |   6   |        plot_normalized_firing_CRF_by_lick_types       |                               Generates normalized firing rate figure                              |
+|      Y      |   9   |                                                       |                               Prints out grouped data for Prism/Excel                              |
+|      Y      |   10  |                                                       |                               Prints out grouped data for Prism/Excel                              |
+|      Y      |   11  |                                                       |                               Prints out grouped data for Prism/Excel                              |
