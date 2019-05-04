@@ -8,7 +8,8 @@ report{1,5}='spike_p_val';
 report{1,6}='spikes_rate_change';
 report{1,7} = 'wave_p_val';
 report{1,8} = 'waves_pearson_R';
-report{1,9} = 'filename';
+report{1,9} = 'unit_name';
+report{1,10} = 'filename';
 
 row = 2;
 for Q=1:length(DATA)
@@ -34,9 +35,10 @@ for Q=1:length(DATA)
             report{row,4} = wave_p<.05;
             report{row,7} = wave_p;%'waves:p_val';
             report{row,8} =  DATA(Q).units(u).lightResponse.tests.waves.xcorrR;%'waves:pearson_R';
-       
+       	
         end
-        report{row,9}=DATA(Q).fileinfo.filename;
+        report{row,9} = DATA(Q).units(u).name;
+        report{row,10}=DATA(Q).fileinfo.filename;
 %         report{row,1} = [Q,u];
 %         report(row,2:width(light_type_response.spike_tests) = struct2table(light_type_response.spike_tests,'AsArray',true);
 %         report{row,3} = struct2table(light_type_response.wave_tests,'AsArray',true);
